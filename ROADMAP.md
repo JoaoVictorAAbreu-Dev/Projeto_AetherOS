@@ -7,6 +7,8 @@
 - QEMU execution scaffolding
 - Minimal kernel entry layout
 - Serial-first observability strategy
+- Boot metadata handoff contract
+- Contributor and documentation foundation for public growth
 
 ## v0.2.0 - CPU and Exceptions
 

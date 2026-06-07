@@ -20,6 +20,7 @@ repository = "https://github.com/example/aetheros"
 
 [workspace.dependencies]
 bitflags = "2.6"
+limine = "0.6.5"
 log = "0.4"
 spin = "0.9"
 x86_64 = "0.15"

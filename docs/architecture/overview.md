@@ -25,9 +25,17 @@
 - `kernel/src/fs`: filesystem abstractions
 - `crates/*`: reusable shared contracts and utilities
 
+Repository navigation reference:
+
+- [docs/architecture/repository-map.md](repository-map.md)
+
 ## Initial Principles
 
 - Prefer simple subsystem contracts.
 - Avoid global coupling across modules.
 - Make architecture decisions explicit in ADRs.
 - Keep observability available from the earliest milestones.
+
+## Boot Status
+
+The current implementation includes a real Limine-based boot entry and serial-first diagnostics. The boot layer now hands a compact `BootInfo` contract to the generic kernel path, which keeps the upcoming memory-management work decoupled from the raw bootloader API.

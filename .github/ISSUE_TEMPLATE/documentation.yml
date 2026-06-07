@@ -1,0 +1,26 @@
+name: Documentation improvement
+description: Suggest improvements to docs, tutorials, diagrams, or onboarding.
+title: "[Docs] "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: Documentation problem
+      description: What is unclear, missing, outdated, or hard to follow?
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: List the files or pages involved.
+      placeholder: README.md, docs/development/setup.md
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+    validations:
+      required: true

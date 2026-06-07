@@ -1,0 +1,43 @@
+name: Feature request
+description: Propose a feature, educational improvement, or subsystem enhancement.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What gap does this feature address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the change and where it fits architecturally.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Architectural impact
+      description: Explain affected modules, docs, or roadmap stages.
+    validations:
+      required: true
+  - type: dropdown
+    id: order
+    attributes:
+      label: Implementation order stage
+      options:
+        - Boot
+        - VGA
+        - Keyboard
+        - Interrupts
+        - Memory Management
+        - Scheduler
+        - VFS
+        - Shell
+        - Process Management
+        - Drivers
+    validations:
+      required: true

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and learning discussions
+    url: https://github.com/JoaoVictorAAbreu-Dev/Projeto_AetherOS/discussions
+    about: Use Discussions for architecture questions, OSDev learning topics, and open-ended design debates.

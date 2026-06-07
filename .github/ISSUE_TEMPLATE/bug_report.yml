@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a bug affecting build, boot, docs, or developer workflow.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the problem objectively.
+      placeholder: The kernel panics during boot after...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide exact steps, commands, and environment details.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Paste serial output, errors, or screenshots if available.
+  - type: dropdown
+    id: subsystem
+    attributes:
+      label: Affected subsystem
+      options:
+        - Boot
+        - VGA
+        - Keyboard
+        - Interrupts
+        - Memory Management
+        - Scheduler
+        - VFS
+        - Shell
+        - Process Management
+        - Drivers
+        - Documentation
+        - Tooling
+    validations:
+      required: true

@@ -1,1 +1,19 @@
-//! Kernel-local helper macros belong here.
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ({
+        $crate::core::logger::print(format_args!($($arg)*));
+    });
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ({
+        $crate::print!("\n");
+    });
+    ($fmt:expr) => ({
+        $crate::print!(concat!($fmt, "\n"));
+    });
+    ($fmt:expr, $($arg:tt)*) => ({
+        $crate::print!(concat!($fmt, "\n"), $($arg)*);
+    });
+}

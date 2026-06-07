@@ -1,6 +1,7 @@
 name: Docs
 
 on:
+  push:
   pull_request:
 
 jobs:
@@ -9,4 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate docs tree
-        run: test -d docs
+        shell: bash
+        run: |
+          test -d docs
+          test -f README.md
+          test -f CONTRIBUTING.md
+          test -f CHANGELOG.md
+          test -f SECURITY.md
+          test -f SUPPORT.md
+          test -f docs/architecture/overview.md
+          test -f docs/tutorials/first-contribution.md
+          test -f docs/showcase/demo-plan.md
