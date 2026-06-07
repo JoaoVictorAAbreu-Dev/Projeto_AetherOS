@@ -35,6 +35,7 @@ The repository already includes:
 - early serial-first diagnostics
 - boot metadata handoff via `BootInfo`
 - initial framebuffer-based visual boot stage
+- initial in-kernel shell and in-memory initramfs/VFS path
 
 Current implementation priority follows this fixed order:
 

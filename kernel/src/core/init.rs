@@ -9,6 +9,8 @@ pub fn initialize(boot_info: &BootInfo) {
     crate::drivers::timer::initialize();
     crate::drivers::keyboard::initialize();
     crate::drivers::framebuffer::initialize(boot_info.framebuffer);
+    crate::fs::initialize();
+    crate::shell::initialize();
     crate::println!("AetherOS: kernel initialized");
     crate::println!("AetherOS: HHDM offset = {:#x}", boot_info.hhdm_offset);
     crate::println!(

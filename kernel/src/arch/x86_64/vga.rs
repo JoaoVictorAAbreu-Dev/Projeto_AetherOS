@@ -63,6 +63,7 @@ pub fn render_boot_visual(framebuffer: FramebufferInfo) {
 
     display.draw_mark(panel_x + panel_width.saturating_sub(84), panel_y + 38, 36, ACCENT);
     display.draw_progress(panel_x + 28, panel_y + panel_height.saturating_sub(42), panel_width.saturating_sub(56), 12);
+    display.fill_rect(64, framebuffer.height.saturating_sub(84), framebuffer.width.saturating_sub(128), 48, 0x0A0F1D);
 }
 
 struct FramebufferDisplay {

@@ -52,6 +52,7 @@
 - Initramfs support
 - Minimal VFS abstraction
 - Read-only boot-time file access
+- In-memory educational filesystem commands
 
 ## v0.8.0 - Processes
 
@@ -71,4 +72,5 @@
 - Core memory subsystem
 - Interrupt and scheduler baseline
 - Minimal syscall surface
+- Minimal interactive shell
 - Documented architecture and contributor workflow

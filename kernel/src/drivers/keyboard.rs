@@ -9,6 +9,10 @@ pub fn initialize() {
     crate::println!("AetherOS: keyboard driver initialized");
 }
 
+pub fn is_initialized() -> bool {
+    INITIALIZED.load(Ordering::Acquire)
+}
+
 pub fn on_interrupt() {
     if !INITIALIZED.load(Ordering::Acquire) {
         return;
@@ -20,7 +24,7 @@ pub fn on_interrupt() {
     };
 
     if let Some(character) = decode_scancode(scancode) {
-        crate::println!("AetherOS: key '{}'", character);
+        crate::shell::on_key(character);
     }
 }
 
@@ -64,6 +68,7 @@ fn decode_scancode(scancode: u8) -> Option<char> {
         0x32 => Some('m'),
         0x39 => Some(' '),
         0x1C => Some('\n'),
+        0x0E => Some('\u{8}'),
         _ => None,
     }
 }

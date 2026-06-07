@@ -12,6 +12,7 @@ pub mod sync;
 pub mod syscall;
 pub mod task;
 pub mod utils;
+pub mod shell;
 
 pub fn run(boot_info: &'static BootInfo) -> ! {
     core::init::initialize(boot_info);
