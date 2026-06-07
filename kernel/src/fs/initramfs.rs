@@ -1,0 +1,1 @@
+//! Initramfs support belongs here.

@@ -1,0 +1,25 @@
+[workspace]
+members = [
+    "kernel",
+    "crates/aether-abi",
+    "crates/aether-bootinfo",
+    "crates/aether-hal",
+    "crates/aether-logging",
+    "crates/aether-sync",
+    "crates/aether-macros",
+    "crates/aether-test",
+    "tools/xtask",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+authors = ["AetherOS Contributors"]
+repository = "https://github.com/example/aetheros"
+
+[workspace.dependencies]
+bitflags = "2.6"
+log = "0.4"
+spin = "0.9"
+x86_64 = "0.15"

@@ -1,0 +1,9 @@
+/target
+/.idea
+/.vscode
+*.log
+*.img
+*.iso
+*.bin
+*.elf
+Cargo.lock

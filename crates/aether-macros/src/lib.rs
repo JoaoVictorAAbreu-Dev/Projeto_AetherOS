@@ -1,0 +1,1 @@
+//! Macro support crate placeholder.
