@@ -34,6 +34,7 @@ The repository already includes:
 - real boot entry skeleton
 - early serial-first diagnostics
 - boot metadata handoff via `BootInfo`
+- initial framebuffer-based visual boot stage
 
 Current implementation priority follows this fixed order:
 

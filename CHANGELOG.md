@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Limine boot request layout
 - Early serial logging path
 - BootInfo handoff for the kernel bring-up stage
+- Initial framebuffer-backed visual boot stage
 - Professional README focused on education and discoverability
 - Contributor onboarding tutorial
 - GitHub issue templates and stronger PR template

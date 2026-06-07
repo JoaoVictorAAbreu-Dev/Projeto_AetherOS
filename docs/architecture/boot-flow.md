@@ -22,11 +22,11 @@ Implemented in this milestone:
 - Kernel `_start` entrypoint
 - Base revision validation
 - Serial-first boot diagnostics
-- `BootInfo` contract with HHDM offset and memory-map entry count
+- `BootInfo` contract with HHDM offset, memory-map entry count, and optional framebuffer metadata
+- Initial framebuffer-backed visual boot rendering
 
 Intentionally deferred:
 
-- VGA
 - Keyboard
 - Interrupt handling
 - Memory allocator setup

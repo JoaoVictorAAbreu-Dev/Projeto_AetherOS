@@ -39,3 +39,7 @@ Repository navigation reference:
 ## Boot Status
 
 The current implementation includes a real Limine-based boot entry and serial-first diagnostics. The boot layer now hands a compact `BootInfo` contract to the generic kernel path, which keeps the upcoming memory-management work decoupled from the raw bootloader API.
+
+## Video Status
+
+The current video stage uses the framebuffer provided by Limine as the practical replacement for classic VGA text mode in this boot flow. This keeps the implementation compatible with modern QEMU and Limine behavior while preserving the project order: Boot first, then visible screen output.

@@ -7,7 +7,7 @@ AetherOS needs visual proof of progress to improve educational value and GitHub 
 ## Demo Priorities
 
 1. Boot serial log
-2. VGA text output
+2. Initial framebuffer boot visual
 3. Keyboard input echo
 4. Timer tick or interrupt activity
 5. Memory map or allocator walkthrough

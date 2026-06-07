@@ -17,6 +17,8 @@ The project uses Limine to reduce early boot complexity and keep the main engine
 - base revision validation
 - early serial diagnostics
 - `BootInfo` handoff into the kernel
+- optional framebuffer metadata handoff
+- initial visual boot rendering on supported framebuffers
 
 ## Expected Serial Output
 

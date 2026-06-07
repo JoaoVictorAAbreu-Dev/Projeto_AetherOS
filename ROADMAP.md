@@ -9,6 +9,7 @@
 - Serial-first observability strategy
 - Boot metadata handoff contract
 - Contributor and documentation foundation for public growth
+- Initial framebuffer-backed boot visual
 
 ## v0.2.0 - CPU and Exceptions
 
