@@ -4,12 +4,6 @@ if (-not $cargo) {
     exit 1
 }
 
-Write-Host "Running AetherOS workspace checks..."
-cargo fmt --all -- --check
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-cargo check --workspace
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-cargo test --workspace
+Write-Host "Running AetherOS workspace checks through xtask..."
+cargo run -p xtask -- test
 exit $LASTEXITCODE

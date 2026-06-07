@@ -9,3 +9,12 @@ check:
 
 test:
     cargo test --workspace
+
+build:
+    cargo run -p xtask -- build
+
+stage:
+    cargo run -p xtask -- stage
+
+run:
+    cargo run -p xtask -- run

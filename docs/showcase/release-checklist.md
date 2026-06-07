@@ -7,6 +7,7 @@
 - README reflects current milestone
 - docs reflect current subsystem boundaries
 - validation status recorded honestly
+- `xtask` flow reviewed for build, stage, run, and test commands
 
 ## Release Notes Should Include
 

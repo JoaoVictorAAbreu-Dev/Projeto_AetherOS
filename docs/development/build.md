@@ -24,6 +24,5 @@ Implemented:
 
 Still pending:
 
-- bootable image assembly flow
-- scripted Limine image creation
-- end-to-end QEMU run automation
+- shipping Limine binaries inside the repository or documenting their exact local installation path
+- assembling a full ISO image instead of the current staged boot tree

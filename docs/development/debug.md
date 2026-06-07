@@ -19,3 +19,10 @@ The intended debug workflow combines:
   - `tasks`
   - `ls`
   - `cat <FILE>`
+
+## Current Runner Entry Points
+
+- `cargo run -p xtask -- build`
+- `cargo run -p xtask -- stage`
+- `cargo run -p xtask -- run`
+- `cargo run -p xtask -- test`

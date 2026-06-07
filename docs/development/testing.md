@@ -19,3 +19,9 @@ The repository now includes real kernel bring-up stages plus a minimal shell and
 - timer interrupts generate ticks
 - keyboard input reaches the shell
 - shell commands `help`, `ls`, `cat`, `mem`, and `tasks` work
+
+## Current Automated Smoke Tests
+
+- boot-info structure test
+- interrupt index offset test
+- memory-region and higher-half mapping test

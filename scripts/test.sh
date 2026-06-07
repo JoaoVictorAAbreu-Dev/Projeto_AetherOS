@@ -5,7 +5,5 @@ if ! command -v cargo >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Running AetherOS workspace checks..."
-cargo fmt --all -- --check || exit $?
-cargo check --workspace || exit $?
-cargo test --workspace
+echo "Running AetherOS workspace checks through xtask..."
+cargo run -p xtask -- test

@@ -18,6 +18,12 @@ license = "MIT"
 authors = ["AetherOS Contributors"]
 repository = "https://github.com/example/aetheros"
 
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
 [workspace.dependencies]
 bitflags = "2.6"
 limine = "0.6.5"

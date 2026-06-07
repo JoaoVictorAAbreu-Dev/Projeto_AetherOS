@@ -6,6 +6,10 @@ edition = "2021"
 [lib]
 path = "src/lib.rs"
 
+[[bin]]
+name = "aether-kernel"
+path = "src/main.rs"
+
 [dependencies]
 aether-bootinfo = { path = "../crates/aether-bootinfo" }
 aether-sync = { path = "../crates/aether-sync" }
