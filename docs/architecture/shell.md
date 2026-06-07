@@ -26,7 +26,7 @@ The first AetherOS shell is intentionally simple. It is a kernel-resident intera
 - `mem`
 - `tasks`
 - `ls`
-- `cat README.TXT`
+- `cat <FILE>`
 - `clear`
 
 ## Why This Design

@@ -15,5 +15,7 @@ pub fn initialize(framebuffer: Option<FramebufferInfo>) {
 pub fn redraw_boot_shell_surface() {
     if let Some(framebuffer) = *FRAMEBUFFER.lock() {
         crate::arch::x86_64::vga::render_boot_visual(framebuffer);
+    } else {
+        crate::println!("AetherOS: framebuffer unavailable, nothing to clear");
     }
 }

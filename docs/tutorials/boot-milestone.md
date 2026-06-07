@@ -45,3 +45,10 @@ Serial-first diagnostics solve this by making early boot visible.
 ## What Comes Next
 
 The next technical step after this milestone is to use the boot metadata to support early memory-management initialization safely and incrementally.
+
+That progression is now underway in the repository through:
+
+- a simple frame allocator
+- a kernel heap
+- a cooperative scheduler baseline
+- a minimal in-kernel shell

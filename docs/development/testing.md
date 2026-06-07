@@ -9,4 +9,13 @@
 
 ## Current Status
 
-The Boot milestone is implemented structurally, but local validation is still pending in this environment because Rust and QEMU are not installed in the current shell context.
+The repository now includes real kernel bring-up stages plus a minimal shell and in-memory VFS. In this environment, however, Rust and QEMU are still unavailable, so runtime validation remains pending here.
+
+## Current Manual Validation Targets
+
+- boot reaches `_start`
+- serial logging works
+- framebuffer visual renders when available
+- timer interrupts generate ticks
+- keyboard input reaches the shell
+- shell commands `help`, `ls`, `cat`, `mem`, and `tasks` work

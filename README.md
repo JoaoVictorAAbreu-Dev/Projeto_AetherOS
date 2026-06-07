@@ -116,6 +116,12 @@ cargo check --workspace
 cargo test --workspace
 ```
 
+PowerShell helpers are available in [`scripts/`](scripts):
+
+- `scripts/setup.ps1`
+- `scripts/test.ps1`
+- `scripts/run-qemu.ps1`
+
 ### Where to Start Reading
 
 - Architecture overview: [docs/architecture/overview.md](docs/architecture/overview.md)
@@ -132,6 +138,7 @@ AetherOS is intentionally structured to help readers answer questions like:
 - How should `arch-specific` and `kernel-generic` code be separated?
 - How do you evolve from bring-up to memory management without architecture drift?
 - What documentation should exist in a serious OSDev project?
+- How can a minimal shell and VFS be introduced before full process isolation?
 
 ## Demo Roadmap
 

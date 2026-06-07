@@ -56,6 +56,7 @@ impl Shell {
             '\u{8}' => {
                 if self.len > 0 {
                     self.len -= 1;
+                    crate::print!("\u{8} \u{8}");
                 }
             }
             _ => {
@@ -93,9 +94,15 @@ impl Shell {
 }
 
 fn execute_command(command: &str) {
-    match command {
+    let mut parts = command.split_whitespace();
+    let head = match parts.next() {
+        Some(head) => head,
+        None => return,
+    };
+
+    match head {
         "help" => {
-            crate::println!("commands: help, info, ticks, mem, tasks, ls, cat README.TXT, clear");
+            crate::println!("commands: help, info, ticks, mem, tasks, ls, cat <FILE>, clear");
         }
         "info" => {
             crate::println!("AetherOS academic kernel");
@@ -127,15 +134,37 @@ fn execute_command(command: &str) {
                 crate::println!("{}", name);
             }
         }
-        "cat README.TXT" => {
-            match crate::fs::vfs::read("/README.TXT") {
+        "cat" => {
+            let Some(path) = parts.next() else {
+                crate::println!("usage: cat <FILE>");
+                return;
+            };
+
+            let normalized = normalize_path(path);
+
+            match crate::fs::vfs::read(normalized) {
                 Some(contents) => crate::println!("{}", contents),
                 None => crate::println!("file not found"),
             }
         }
         "clear" => {
             crate::drivers::framebuffer::redraw_boot_shell_surface();
+            crate::println!("screen redrawn");
         }
         _ => crate::println!("unknown command: {}", command),
+    }
+}
+
+fn normalize_path(path: &str) -> &str {
+    if path.starts_with('/') {
+        path
+    } else {
+        match path {
+            "README.TXT" => "/README.TXT",
+            "STATUS.TXT" => "/STATUS.TXT",
+            "ROADMAP.TXT" => "/ROADMAP.TXT",
+            "COMMANDS.TXT" => "/COMMANDS.TXT",
+            _ => path,
+        }
     }
 }

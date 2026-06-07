@@ -8,13 +8,17 @@ pub fn initialize() {
     INITIALIZED.call_once(|| {});
 }
 
-pub fn list_root_entries() -> [&'static str; 3] {
-    let files = crate::fs::initramfs::files();
-    [files[0].path, files[1].path, files[2].path]
+pub fn list_root_entries() -> &'static [&'static str] {
+    static ROOT_ENTRIES: [&str; 4] = ["/README.TXT", "/STATUS.TXT", "/ROADMAP.TXT", "/COMMANDS.TXT"];
+    &ROOT_ENTRIES
 }
 
 pub fn read(path: &str) -> Option<&'static str> {
     find(path).map(|file| file.contents)
+}
+
+pub fn exists(path: &str) -> bool {
+    find(path).is_some()
 }
 
 fn find(path: &str) -> Option<&'static InitramfsFile> {
