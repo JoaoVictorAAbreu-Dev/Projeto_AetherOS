@@ -13,3 +13,14 @@
 - Keep physical and virtual memory concerns separate.
 - Avoid embedding allocation policy inside unrelated modules.
 - Prefer small explicit types over ad hoc pointer math spread across the codebase.
+
+## Current Sprint 2 Scope
+
+The current memory stage targets the minimum viable operational kernel core:
+
+- copy a stable snapshot of the bootloader memory map into `BootInfo`
+- discover usable physical frames
+- expose a simple frame allocator
+- initialize a small kernel heap
+
+This is intentionally conservative. The goal is to establish reliable internal state before introducing more advanced paging or address-space isolation.

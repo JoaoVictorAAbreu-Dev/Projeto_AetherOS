@@ -8,6 +8,7 @@ path = "src/lib.rs"
 
 [dependencies]
 aether-bootinfo = { path = "../crates/aether-bootinfo" }
+aether-sync = { path = "../crates/aether-sync" }
 bitflags.workspace = true
 limine.workspace = true
 log.workspace = true

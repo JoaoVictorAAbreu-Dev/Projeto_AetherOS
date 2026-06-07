@@ -4,6 +4,8 @@ pub fn initialize(boot_info: &BootInfo) {
     crate::arch::x86_64::gdt::init();
     crate::arch::x86_64::idt::init();
     crate::arch::x86_64::interrupts::init();
+    crate::memory::initialize(boot_info);
+    crate::task::initialize();
     crate::drivers::timer::initialize();
     crate::drivers::keyboard::initialize();
     crate::drivers::framebuffer::initialize(boot_info.framebuffer);
@@ -20,6 +22,18 @@ pub fn initialize(boot_info: &BootInfo) {
         } else {
             "unavailable"
         }
+    );
+    crate::println!(
+        "AetherOS: usable frames discovered = {}",
+        crate::memory::frame_allocator::usable_frame_count()
+    );
+    crate::println!(
+        "AetherOS: kernel heap bytes = {}",
+        crate::memory::heap::heap_size()
+    );
+    crate::println!(
+        "AetherOS: scheduler tasks = {}",
+        crate::task::scheduler::task_count()
     );
     crate::println!("AetherOS: interrupts enabled");
 }

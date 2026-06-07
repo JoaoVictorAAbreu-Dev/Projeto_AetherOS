@@ -1,4 +1,10 @@
-use aether_bootinfo::{BootInfo, FramebufferInfo};
+use aether_bootinfo::{
+    BootInfo,
+    FramebufferInfo,
+    MemoryRegion,
+    MemoryRegionKind,
+    MAX_MEMORY_REGIONS,
+};
 use limine::request::{
     FramebufferRequest,
     HhdmRequest,
@@ -64,6 +70,16 @@ fn collect_boot_info() -> BootInfo {
     let memory_map_response = MEMORY_MAP_REQUEST
         .get_response()
         .expect("Limine did not provide a memory map response");
+    let mut regions = [MemoryRegion::EMPTY; MAX_MEMORY_REGIONS];
+
+    for (index, entry) in memory_map_response.entries().iter().take(MAX_MEMORY_REGIONS).enumerate() {
+        regions[index] = MemoryRegion::new(
+            entry.base(),
+            entry.length(),
+            classify_memory_region(entry.entry_type() as u64),
+        );
+    }
+
     let framebuffer = FRAMEBUFFER_REQUEST
         .get_response()
         .and_then(|response| response.framebuffers().next())
@@ -81,5 +97,17 @@ fn collect_boot_info() -> BootInfo {
         hhdm_response.offset() as u64,
         memory_map_response.entries().len(),
         framebuffer,
+        regions,
     )
+}
+
+fn classify_memory_region(entry_type: u64) -> MemoryRegionKind {
+    match entry_type {
+        0 => MemoryRegionKind::Usable,
+        5 => MemoryRegionKind::Reclaimable,
+        6 => MemoryRegionKind::Kernel,
+        7 => MemoryRegionKind::Framebuffer,
+        1 | 2 | 3 | 4 => MemoryRegionKind::Reserved,
+        _ => MemoryRegionKind::Unknown,
+    }
 }
