@@ -17,6 +17,17 @@ pub fn heap_size() -> usize {
     HEAP_SIZE
 }
 
+pub fn heap_used() -> usize {
+    let start = GLOBAL_ALLOCATOR.heap_start.load(Ordering::Acquire);
+    let next = GLOBAL_ALLOCATOR.next.load(Ordering::Acquire);
+
+    if start == 0 || next < start {
+        0
+    } else {
+        next - start
+    }
+}
+
 struct BumpAllocator {
     heap_start: AtomicUsize,
     heap_end: AtomicUsize,

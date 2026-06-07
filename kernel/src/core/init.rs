@@ -28,12 +28,24 @@ pub fn initialize(boot_info: &BootInfo) {
         crate::memory::frame_allocator::usable_frame_count()
     );
     crate::println!(
+        "AetherOS: usable physical ranges = {}",
+        crate::memory::frame_allocator::usable_range_count()
+    );
+    crate::println!(
         "AetherOS: kernel heap bytes = {}",
         crate::memory::heap::heap_size()
     );
     crate::println!(
+        "AetherOS: kernel heap used = {}",
+        crate::memory::heap::heap_used()
+    );
+    crate::println!(
         "AetherOS: scheduler tasks = {}",
         crate::task::scheduler::task_count()
+    );
+    crate::println!(
+        "AetherOS: current task = {:?}",
+        crate::task::scheduler::current_task_name()
     );
     crate::println!("AetherOS: interrupts enabled");
 }

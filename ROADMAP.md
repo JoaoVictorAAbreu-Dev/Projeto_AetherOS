@@ -24,6 +24,7 @@
 - Physical frame allocator
 - Virtual memory abstraction
 - Kernel heap initialization
+- Kernel memory state inspection hooks
 
 ## v0.4.0 - Tasks
 
@@ -31,6 +32,7 @@
 - Cooperative scheduling baseline
 - Context representation
 - Basic synchronization primitives
+- Init and idle task baseline
 
 ## v0.5.0 - Syscalls
 

@@ -22,5 +22,6 @@ The current memory stage targets the minimum viable operational kernel core:
 - discover usable physical frames
 - expose a simple frame allocator
 - initialize a small kernel heap
+- expose inspectable memory state for later shell/debug use
 
 This is intentionally conservative. The goal is to establish reliable internal state before introducing more advanced paging or address-space isolation.

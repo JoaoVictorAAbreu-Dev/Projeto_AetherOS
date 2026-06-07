@@ -9,6 +9,7 @@ pub fn initialize() {
 
 pub fn on_tick() {
     let tick = TICKS.fetch_add(1, Ordering::AcqRel) + 1;
+    crate::task::scheduler::tick();
 
     if tick % 100 == 0 {
         crate::println!("AetherOS: uptime ticks={}", tick);
