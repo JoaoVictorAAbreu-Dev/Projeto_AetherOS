@@ -136,6 +136,7 @@ PowerShell helpers are available in [`scripts/`](scripts):
 - `scripts/setup.ps1`
 - `scripts/test.ps1`
 - `scripts/run-qemu.ps1`
+- `scripts/boot-check.ps1`
 
 Windows note:
 

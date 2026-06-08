@@ -1,0 +1,10 @@
+entry
+revision-accepted
+collecting-boot-info
+hhdm-ready
+memory-map-ready
+regions-mapped
+framebuffer-ready
+boot-info-ready
+kernel-init
+AetherOS: kernel initialized

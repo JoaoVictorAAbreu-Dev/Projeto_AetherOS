@@ -20,3 +20,6 @@ All notable changes to this project will be documented in this file.
 - GitHub issue templates and stronger PR template
 - Security and support policies
 - Wiki, demo, and release planning documentation
+- Headless QEMU boot validation through `xtask boot-check`
+- CI jobs for host validation, staged UEFI tree generation, and headless boot verification
+- Early boot-stage markers and panic-stage reporting for bring-up diagnostics

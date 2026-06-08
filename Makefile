@@ -6,6 +6,7 @@ help:
 	@echo "  build   - Build the kernel target"
 	@echo "  stage   - Stage boot assets"
 	@echo "  run     - Attempt to launch QEMU"
+	@echo "  boot-check - Verify headless QEMU boot"
 
 fmt:
 	cargo fmt --all
@@ -24,3 +25,6 @@ stage:
 
 run:
 	cargo run -p xtask -- run
+
+boot-check:
+	cargo run -p xtask -- boot-check

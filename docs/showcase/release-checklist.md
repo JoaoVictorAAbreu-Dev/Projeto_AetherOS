@@ -8,6 +8,7 @@
 - docs reflect current subsystem boundaries
 - validation status recorded honestly
 - `xtask` flow reviewed for build, stage, run, and test commands
+- `xtask boot-check` log captured and reviewed
 
 ## Release Notes Should Include
 
@@ -17,6 +18,7 @@
 - what is still missing
 - screenshots, GIFs, or serial logs
 - contributor opportunities for the next milestone
+- exact boot validation command used
 
 ## Good Release Titles
 

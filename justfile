@@ -18,3 +18,6 @@ stage:
 
 run:
     cargo run -p xtask -- run
+
+boot-check:
+    cargo run -p xtask -- boot-check
