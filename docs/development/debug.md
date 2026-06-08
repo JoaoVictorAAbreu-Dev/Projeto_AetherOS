@@ -10,6 +10,7 @@ The intended debug workflow combines:
 ## Current Debug Surfaces
 
 - serial boot logs
+- serial boot stage markers
 - exception diagnostics
 - timer tick logging
 - shell commands:
@@ -26,3 +27,19 @@ The intended debug workflow combines:
 - `cargo run -p xtask -- stage`
 - `cargo run -p xtask -- run`
 - `cargo run -p xtask -- test`
+
+## Boot Failure Triage
+
+If the kernel halts during early bring-up, the serial output should now reveal the last successful boot stage:
+
+- `entry`
+- `revision-accepted`
+- `collecting-boot-info`
+- `hhdm-ready`
+- `memory-map-ready`
+- `regions-mapped`
+- `framebuffer-ready`
+- `boot-info-ready`
+- `kernel-init`
+
+The panic path also reports the current boot stage before printing panic details.

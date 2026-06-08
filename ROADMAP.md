@@ -65,6 +65,7 @@
 - Regression tests in QEMU
 - Better diagnostics
 - Debugging workflow hardening
+- Explicit early-boot stage observability
 
 ## v1.0.0 - Academic Stable Base
 
