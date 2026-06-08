@@ -114,6 +114,7 @@ AetherOS/
 
 ```bash
 cargo run -p xtask -- test
+cargo run -p xtask -- boot-check
 ```
 
 ### First Boot In QEMU
@@ -128,6 +129,7 @@ Notes:
 - The boot flow uses UEFI firmware plus a FAT-backed ESP directory, not `qemu -kernel`.
 - On headless environments, set `AETHER_QEMU_DISPLAY=none`.
 - To redirect serial logs, set `AETHER_QEMU_SERIAL=file:dist/serial.log`.
+- `cargo run -p xtask -- boot-check` validates headless boot by waiting for the serial marker `AetherOS: kernel initialized`.
 
 PowerShell helpers are available in [`scripts/`](scripts):
 

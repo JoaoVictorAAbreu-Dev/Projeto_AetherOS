@@ -1,8 +1,11 @@
 use std::env;
 use std::fs;
 use std::io;
+use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitCode};
+use std::process::{Child, Command, ExitCode, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 const LIMINE_DOWNLOAD_URL: &str =
     "https://github.com/limine-bootloader/limine/releases/latest/download/limine-binary.zip";
@@ -13,6 +16,8 @@ const EFI_BOOT_DIR: &str = "EFI/BOOT";
 const LIMINE_CONF_NAME: &str = "limine.conf";
 const LIMINE_BOOTX64_NAME: &str = "BOOTX64.EFI";
 const LIMINE_VARS_NAME: &str = "edk2-x86_64-vars.fd";
+const DEFAULT_BOOT_TIMEOUT_SECS: u64 = 20;
+const DEFAULT_BOOT_SUCCESS_MARKER: &str = "AetherOS: kernel initialized";
 
 fn main() -> ExitCode {
     match run() {
@@ -36,6 +41,7 @@ fn run() -> Result<(), String> {
         "build" => build_kernel(),
         "stage" => stage_boot_tree(),
         "run" => run_qemu(args.any(|arg| arg == "--debug")),
+        "boot-check" => verify_qemu_boot(),
         "test" => run_workspace_tests(),
         other => Err(format!("unknown xtask command: {other}")),
     }
@@ -47,6 +53,7 @@ fn print_help() {
     println!("  build    Build the kernel target");
     println!("  stage    Build the kernel and stage a bootable UEFI tree");
     println!("  run      Stage assets and launch QEMU through Limine");
+    println!("  boot-check  Run headless QEMU and verify boot success from serial logs");
     println!("  test     Run formatting, host-safe tests, and kernel checks");
 }
 
@@ -106,42 +113,74 @@ fn stage_boot_tree() -> Result<(), String> {
 
 fn run_qemu(debug: bool) -> Result<(), String> {
     stage_boot_tree()?;
-
-    let root = workspace_root();
-    let qemu =
-        find_qemu_binary().ok_or_else(|| "qemu-system-x86_64 executable not found".to_string())?;
-    let ovmf_code = find_ovmf_code().ok_or_else(|| {
-        "UEFI firmware not found. Install QEMU with edk2/OVMF firmware support.".to_string()
-    })?;
-    let ovmf_vars = ensure_ovmf_vars(&root)?;
-    let stage_dir = root.join(DIST_DIR).join(ESP_DIR);
-
-    let mut command = Command::new(qemu);
-    command
-        .current_dir(&root)
-        .arg("-machine")
-        .arg("q35")
-        .arg("-m")
-        .arg("256M")
-        .arg("-serial")
-        .arg(qemu_serial_mode())
-        .arg("-drive")
-        .arg(format!(
-            "if=pflash,format=raw,readonly=on,file={}",
-            ovmf_code.display()
-        ))
-        .arg("-drive")
-        .arg(format!("if=pflash,format=raw,file={}", ovmf_vars.display()))
-        .arg("-drive")
-        .arg(format!("format=raw,file=fat:rw:{}", stage_dir.display()))
-        .arg("-display")
-        .arg(qemu_display_mode());
+    let mut command =
+        build_qemu_command(&workspace_root(), &qemu_serial_mode(), &qemu_display_mode())?;
 
     if debug {
         command.arg("-s").arg("-S");
     }
 
     run_command(&mut command, "qemu-system-x86_64")
+}
+
+fn verify_qemu_boot() -> Result<(), String> {
+    stage_boot_tree()?;
+
+    let root = workspace_root();
+    let serial_log = root.join(DIST_DIR).join("serial.log");
+    let success_marker = boot_success_marker();
+    let timeout = Duration::from_secs(boot_timeout_secs());
+
+    if serial_log.exists() {
+        fs::remove_file(&serial_log)
+            .map_err(|err| format!("failed to clear previous serial log: {err}"))?;
+    }
+
+    let serial_mode = format!("file:{}", serial_log.display());
+    let mut command = build_qemu_command(&root, &serial_mode, "none")?;
+    command.stdout(Stdio::null()).stderr(Stdio::piped());
+
+    let mut child = command
+        .spawn()
+        .map_err(|err| format!("failed to start qemu-system-x86_64: {err}"))?;
+
+    let started = Instant::now();
+    loop {
+        if serial_log.contains_marker(&success_marker)? {
+            terminate_child(&mut child)?;
+            println!(
+                "boot-check passed in {:.2}s using marker: {}",
+                started.elapsed().as_secs_f32(),
+                success_marker
+            );
+            println!("serial log: {}", serial_log.display());
+            return Ok(());
+        }
+
+        if let Some(status) = child
+            .try_wait()
+            .map_err(|err| format!("failed while polling QEMU status: {err}"))?
+        {
+            let stderr = read_child_stderr(&mut child)?;
+            let tail = serial_log.tail_lines(20)?;
+            return Err(format!(
+                "QEMU exited before boot success. status={status}. marker='{success_marker}'. serial_tail=\n{tail}\nqemu_stderr=\n{stderr}"
+            ));
+        }
+
+        if started.elapsed() >= timeout {
+            let tail = serial_log.tail_lines(20)?;
+            terminate_child(&mut child)?;
+            return Err(format!(
+                "boot-check timed out after {}s waiting for marker '{}'. serial_tail=\n{}",
+                timeout.as_secs(),
+                success_marker,
+                tail
+            ));
+        }
+
+        thread::sleep(Duration::from_millis(200));
+    }
 }
 
 fn run_workspace_tests() -> Result<(), String> {
@@ -173,6 +212,43 @@ fn run_workspace_tests() -> Result<(), String> {
     )
 }
 
+fn build_qemu_command(
+    root: &Path,
+    serial_mode: &str,
+    display_mode: &str,
+) -> Result<Command, String> {
+    let qemu =
+        find_qemu_binary().ok_or_else(|| "qemu-system-x86_64 executable not found".to_string())?;
+    let ovmf_code = find_ovmf_code().ok_or_else(|| {
+        "UEFI firmware not found. Install QEMU with edk2/OVMF firmware support.".to_string()
+    })?;
+    let ovmf_vars = ensure_ovmf_vars(root)?;
+    let stage_dir = root.join(DIST_DIR).join(ESP_DIR);
+
+    let mut command = Command::new(qemu);
+    command
+        .current_dir(root)
+        .arg("-machine")
+        .arg("q35")
+        .arg("-m")
+        .arg("256M")
+        .arg("-serial")
+        .arg(serial_mode)
+        .arg("-drive")
+        .arg(format!(
+            "if=pflash,format=raw,readonly=on,file={}",
+            ovmf_code.display()
+        ))
+        .arg("-drive")
+        .arg(format!("if=pflash,format=raw,file={}", ovmf_vars.display()))
+        .arg("-drive")
+        .arg(format!("format=raw,file=fat:rw:{}", stage_dir.display()))
+        .arg("-display")
+        .arg(display_mode);
+
+    Ok(command)
+}
+
 fn run_command(command: &mut Command, label: &str) -> Result<(), String> {
     let status = command
         .status()
@@ -183,6 +259,32 @@ fn run_command(command: &mut Command, label: &str) -> Result<(), String> {
     } else {
         Err(format!("{label} exited with status {status}"))
     }
+}
+
+fn terminate_child(child: &mut Child) -> Result<(), String> {
+    match child.try_wait() {
+        Ok(Some(_)) => Ok(()),
+        Ok(None) => {
+            child
+                .kill()
+                .map_err(|err| format!("failed to terminate QEMU after verification: {err}"))?;
+            child
+                .wait()
+                .map_err(|err| format!("failed to wait for QEMU shutdown: {err}"))?;
+            Ok(())
+        }
+        Err(err) => Err(format!("failed to inspect QEMU process state: {err}")),
+    }
+}
+
+fn read_child_stderr(child: &mut Child) -> Result<String, String> {
+    let mut stderr = String::new();
+    if let Some(mut handle) = child.stderr.take() {
+        handle
+            .read_to_string(&mut stderr)
+            .map_err(|err| format!("failed to read QEMU stderr: {err}"))?;
+    }
+    Ok(stderr)
 }
 
 fn locate_kernel_binary(root: &Path) -> Result<PathBuf, String> {
@@ -411,6 +513,19 @@ fn qemu_serial_mode() -> String {
     env::var("AETHER_QEMU_SERIAL").unwrap_or_else(|_| "stdio".to_string())
 }
 
+fn boot_timeout_secs() -> u64 {
+    env::var("AETHER_BOOT_TIMEOUT_SECS")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or(DEFAULT_BOOT_TIMEOUT_SECS)
+}
+
+fn boot_success_marker() -> String {
+    env::var("AETHER_BOOT_SUCCESS_MARKER")
+        .unwrap_or_else(|_| DEFAULT_BOOT_SUCCESS_MARKER.to_string())
+}
+
 fn workspace_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
@@ -440,5 +555,34 @@ fn preferred_rustup_toolchain() -> Option<String> {
         Some("nightly-x86_64-pc-windows-gnu".to_string())
     } else {
         Some("nightly".to_string())
+    }
+}
+
+trait SerialLogExt {
+    fn contains_marker(&self, marker: &str) -> Result<bool, String>;
+    fn tail_lines(&self, max_lines: usize) -> Result<String, String>;
+}
+
+impl SerialLogExt for PathBuf {
+    fn contains_marker(&self, marker: &str) -> Result<bool, String> {
+        if !self.exists() {
+            return Ok(false);
+        }
+
+        let content = fs::read_to_string(self)
+            .map_err(|err| format!("failed to read serial log {}: {err}", self.display()))?;
+        Ok(content.contains(marker))
+    }
+
+    fn tail_lines(&self, max_lines: usize) -> Result<String, String> {
+        if !self.exists() {
+            return Ok("<serial log not created>".to_string());
+        }
+
+        let content = fs::read_to_string(self)
+            .map_err(|err| format!("failed to read serial log {}: {err}", self.display()))?;
+        let lines: Vec<_> = content.lines().collect();
+        let start = lines.len().saturating_sub(max_lines);
+        Ok(lines[start..].join("\n"))
     }
 }

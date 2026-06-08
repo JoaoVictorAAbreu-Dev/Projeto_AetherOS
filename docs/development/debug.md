@@ -26,6 +26,7 @@ The intended debug workflow combines:
 - `cargo run -p xtask -- build`
 - `cargo run -p xtask -- stage`
 - `cargo run -p xtask -- run`
+- `cargo run -p xtask -- boot-check`
 - `cargo run -p xtask -- test`
 
 ## Boot Failure Triage

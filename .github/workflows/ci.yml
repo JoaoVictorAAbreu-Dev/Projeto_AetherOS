@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  host-validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,5 +19,37 @@ jobs:
           components: rust-src, llvm-tools-preview
       - name: Cache Rust artifacts
         uses: Swatinem/rust-cache@v2
-      - name: Check workspace
-        run: cargo check --workspace
+      - name: Run xtask host validation
+        run: cargo run -p xtask -- test
+
+  stage-boot-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src, llvm-tools-preview
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+      - name: Stage UEFI boot tree
+        run: cargo run -p xtask -- stage
+
+  qemu-boot-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src, llvm-tools-preview
+      - name: Install QEMU and OVMF
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 ovmf
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+      - name: Verify headless QEMU boot
+        env:
+          AETHER_BOOT_TIMEOUT_SECS: 30
+        run: cargo run -p xtask -- boot-check

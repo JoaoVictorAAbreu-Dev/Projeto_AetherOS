@@ -15,6 +15,7 @@ The repository now includes real kernel bring-up stages plus a minimal shell and
 
 ```bash
 cargo run -p xtask -- test
+cargo run -p xtask -- boot-check
 ```
 
 This command currently performs:
@@ -23,10 +24,20 @@ This command currently performs:
 - `cargo +nightly check --workspace`
 - `cargo +nightly test -p aether-bootinfo -p xtask`
 
+The boot verification command currently performs:
+
+- `cargo run -p xtask -- stage`
+- headless QEMU launch with `-display none`
+- serial log capture to `dist/serial.log`
+- success detection using the `AetherOS: kernel initialized` marker
+- timeout-based failure with serial log tail included in the error message
+
 For QEMU runtime capture:
 
 - `AETHER_QEMU_DISPLAY=none`
 - `AETHER_QEMU_SERIAL=file:dist/serial.log`
+- `AETHER_BOOT_TIMEOUT_SECS=30`
+- `AETHER_BOOT_SUCCESS_MARKER="AetherOS: kernel initialized"`
 
 ## Current Manual Validation Targets
 
@@ -41,3 +52,4 @@ For QEMU runtime capture:
 
 - boot-info structure test
 - workspace tooling smoke test
+- headless QEMU boot marker verification
