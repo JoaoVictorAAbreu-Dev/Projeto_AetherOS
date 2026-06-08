@@ -29,6 +29,7 @@ It does:
 - maintain a small static task table
 - rotate the active task on timer ticks
 - expose the current task name and state for shell/debug commands
+- expose execution mode and address-space intent for the current task
 
 It does not do:
 
@@ -36,3 +37,13 @@ It does not do:
 - blocking and wake-up queues
 - process spawning
 - address-space isolation
+
+## Post-v1 User-mode Foundation
+
+The scheduler-facing process model now includes:
+
+- an execution mode flag (`kernel` or `user`)
+- an address-space kind (`kernel-only` or `kernel-and-user`)
+- an optional user-program image descriptor for future loaders
+
+This is still descriptive groundwork, not full user-mode execution.

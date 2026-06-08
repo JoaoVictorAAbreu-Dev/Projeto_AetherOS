@@ -138,6 +138,18 @@ fn execute_command(command: &str) {
                     .map(|state| state.label())
                     .unwrap_or("unavailable")
             );
+            crate::println!(
+                "current task mode = {}",
+                crate::task::scheduler::current_task_execution_mode()
+                    .map(|mode| mode.label())
+                    .unwrap_or("unavailable")
+            );
+            crate::println!(
+                "address space kind = {}",
+                crate::task::scheduler::current_task_address_space_kind()
+                    .map(|kind| kind.label())
+                    .unwrap_or("unavailable")
+            );
         }
         "ticks" => {
             crate::println!("ticks = {}", crate::drivers::timer::ticks());
@@ -168,6 +180,18 @@ fn execute_command(command: &str) {
                 "current task state = {}",
                 crate::task::scheduler::current_task_state()
                     .map(|state| state.label())
+                    .unwrap_or("unavailable")
+            );
+            crate::println!(
+                "current task mode = {}",
+                crate::task::scheduler::current_task_execution_mode()
+                    .map(|mode| mode.label())
+                    .unwrap_or("unavailable")
+            );
+            crate::println!(
+                "address space kind = {}",
+                crate::task::scheduler::current_task_address_space_kind()
+                    .map(|kind| kind.label())
                     .unwrap_or("unavailable")
             );
         }

@@ -182,6 +182,7 @@ A prepared plan for demos, GIFs, and release assets lives in [docs/showcase/demo
   - [docs/architecture/interrupts.md](docs/architecture/interrupts.md)
   - [docs/architecture/scheduler.md](docs/architecture/scheduler.md)
   - [docs/architecture/syscall.md](docs/architecture/syscall.md)
+  - [docs/architecture/user-mode.md](docs/architecture/user-mode.md)
 - Development
   - [docs/development/setup.md](docs/development/setup.md)
   - [docs/development/build.md](docs/development/build.md)

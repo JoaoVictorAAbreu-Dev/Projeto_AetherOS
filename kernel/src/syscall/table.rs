@@ -6,4 +6,6 @@ pub enum Syscall {
     QueryTaskCount = 2,
     QueryHeapUsage = 3,
     QueryUsableFrames = 4,
+    QueryExecutionMode = 5,
+    QueryAddressSpaceKind = 6,
 }

@@ -2,7 +2,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 use spin::Mutex;
 
-use crate::task::process::{Process, ProcessState};
+use crate::memory::address_space::AddressSpaceKind;
+use crate::task::process::{ExecutionMode, Process, ProcessState};
 
 const MAX_TASKS: usize = 16;
 
@@ -38,6 +39,20 @@ pub fn current_task_name() -> Option<&'static str> {
 
 pub fn current_task_state() -> Option<ProcessState> {
     SCHEDULER.lock().current_task().map(|task| task.state)
+}
+
+pub fn current_task_execution_mode() -> Option<ExecutionMode> {
+    SCHEDULER
+        .lock()
+        .current_task()
+        .map(|task| task.execution_mode)
+}
+
+pub fn current_task_address_space_kind() -> Option<AddressSpaceKind> {
+    SCHEDULER
+        .lock()
+        .current_task()
+        .map(|task| task.address_space.kind)
 }
 
 pub fn scheduling_model() -> &'static str {

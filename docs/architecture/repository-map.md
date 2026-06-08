@@ -22,6 +22,12 @@ Within `kernel/`, the VFS now separates:
 - writable overlay files managed in memory
 - storage-facing expansion points under `drivers/storage`
 
+The task and memory layers also now carry explicit post-v1 user-mode intent through:
+
+- process execution mode metadata
+- address-space kind metadata
+- user program image descriptors
+
 ## Design Intent
 
 The repository is structured to keep these concerns separate:
