@@ -21,8 +21,8 @@ The local environment should support:
 - workspace formatting
 - workspace type checking
 - QEMU execution
-- future serial-log capture
-- future debugger attachment
+- serial-log capture during headless boot checks
+- optional debugger attachment for low-level investigation
 
 ## Typical Setup Checklist
 
@@ -41,6 +41,6 @@ cargo run -p xtask -- test
 ## Notes
 
 - `cargo run -p xtask -- run` downloads the official Limine bundle into `dist/limine/` on first use.
+- `cargo run -p xtask -- boot-check` is the preferred runtime validation command for testers and CI.
 - On Windows with the GNU toolchain, prefer cloning into an ASCII-only path without spaces if the linker reports object-file lookup failures.
 - If QEMU is not installed, build validation may still work but runtime milestones cannot be demonstrated.
-- When the project begins shipping demo assets, this setup guide should also document how to capture serial logs and screenshots.

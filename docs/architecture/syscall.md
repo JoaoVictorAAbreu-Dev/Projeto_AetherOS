@@ -10,6 +10,6 @@ Syscalls should be introduced only after the memory and task model are stable en
 - Centralize syscall dispatch
 - Avoid exposing internal kernel structures
 
-## Current Sprint 3 Position
+## Current v1 Position
 
-At this stage, syscalls are still internal kernel-facing hooks used for inspection and staged evolution. The shell uses direct kernel modules for now, while the syscall surface remains a transition point toward a cleaner future boundary.
+In v1, syscalls are still internal kernel-facing hooks used for inspection and staged evolution. The shell uses direct kernel modules for now, while the syscall surface stays intentionally narrow until user-mode execution becomes a real milestone.

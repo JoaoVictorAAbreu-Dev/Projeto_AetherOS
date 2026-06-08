@@ -95,7 +95,7 @@ AetherOS/
 |-- kernel/      # Kernel source tree
 |-- scripts/     # Local helper scripts
 |-- tests/       # Integration and QEMU-oriented tests
-|-- tools/       # Project tooling and future build helpers
+|-- tools/       # Project tooling and automation helpers
 `-- user/        # Future userland-facing artifacts
 ```
 
@@ -149,6 +149,7 @@ Windows note:
 - Setup guide: [docs/development/setup.md](docs/development/setup.md)
 - Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
+- v1 validation: [docs/showcase/v1-validation.md](docs/showcase/v1-validation.md)
 
 ## Educational Value
 

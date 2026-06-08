@@ -1,3 +1,9 @@
 # QEMU Runner
 
-Reserved for structured QEMU execution helpers beyond the initial shell scripts.
+QEMU execution is currently handled through `tools/xtask` and the shell scripts in `scripts/`.
+
+This directory remains available only if the project later needs:
+
+- scripted input scenarios
+- framebuffer capture helpers
+- richer runtime orchestration outside the core `xtask`

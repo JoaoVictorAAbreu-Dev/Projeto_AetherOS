@@ -12,9 +12,9 @@ This page explains why the repository is organized the way it is, so contributor
 - `docs/`: architecture, onboarding, tutorials, and project strategy
 - `kernel/`: kernel implementation
 - `scripts/`: local workflow helpers
-- `tests/`: integration and future QEMU-driven validation
+- `tests/`: host-safe integration notes, fixtures, and QEMU validation references
 - `tools/`: project-side tooling and automation helpers
-- `user/`: reserved for future userland-facing artifacts
+- `user/`: userland-facing space kept available for later milestones without affecting the v1 kernel layout
 
 ## Design Intent
 

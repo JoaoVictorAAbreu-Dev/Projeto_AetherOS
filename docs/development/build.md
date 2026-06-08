@@ -28,7 +28,7 @@ Implemented:
 - reusable `dist/edk2-x86_64-vars.fd` copy for writable firmware variables
 - headless boot verification through serial log success markers
 
-Still pending:
+Remaining optional improvements:
 
 - ISO release packaging
 - automated screenshot artifact capture during QEMU runs

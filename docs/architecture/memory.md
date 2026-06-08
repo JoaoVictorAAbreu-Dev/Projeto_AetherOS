@@ -14,7 +14,7 @@
 - Avoid embedding allocation policy inside unrelated modules.
 - Prefer small explicit types over ad hoc pointer math spread across the codebase.
 
-## Current Sprint 2 Scope
+## Current v1 Scope
 
 The current memory stage targets the minimum viable operational kernel core:
 

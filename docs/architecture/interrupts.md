@@ -15,9 +15,9 @@
 4. Timer interrupt
 5. Broader IRQ integration
 
-## Current Sprint 1 Scope
+## Current v1 Scope
 
-The current implementation target is intentionally minimal:
+The current interrupt baseline is intentionally minimal:
 
 - GDT with TSS support for a safe double-fault stack
 - IDT with core exception handlers

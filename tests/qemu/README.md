@@ -48,7 +48,7 @@ Covered:
 - boot-info collection
 - generic kernel initialization
 
-Not yet covered:
+Not covered by the current boot gate:
 
 - automated shell interaction
 - keyboard IRQ input scripting

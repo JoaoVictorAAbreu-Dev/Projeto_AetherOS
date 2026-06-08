@@ -80,12 +80,15 @@ Every PR should state:
 When possible, use:
 
 ```bash
-cargo fmt --all
-cargo check --workspace
-cargo test --workspace
+cargo run -p xtask -- test
+cargo run -p xtask -- stage
 ```
 
-If QEMU validation exists for your change, document the exact command used.
+If runtime validation exists for your change, document the exact command used. Preferred command:
+
+```bash
+cargo run -p xtask -- boot-check
+```
 
 If you could not run validation, write:
 

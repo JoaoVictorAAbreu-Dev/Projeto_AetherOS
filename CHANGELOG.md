@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0] - Unreleased
+## [1.0.0] - Pending Release Tag
 
 ### Added
 
@@ -10,7 +10,6 @@ All notable changes to this project will be documented in this file.
 - Workspace scaffolding
 - Architecture documentation
 - ADR for boot protocol selection
-- Build and test script placeholders
 - Limine boot request layout
 - Early serial logging path
 - BootInfo handoff for the kernel bring-up stage
@@ -23,3 +22,5 @@ All notable changes to this project will be documented in this file.
 - Headless QEMU boot validation through `xtask boot-check`
 - CI jobs for host validation, staged UEFI tree generation, and headless boot verification
 - Early boot-stage markers and panic-stage reporting for bring-up diagnostics
+- Stabilized keyboard input path with Shift-aware shell input
+- Cleaner VFS-backed shell file reads and clearer scheduler observability
