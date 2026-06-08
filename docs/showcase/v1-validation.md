@@ -44,3 +44,17 @@ Out of scope for v1:
 - advanced driver coverage
 - full filesystem persistence
 - automated framebuffer assertions
+
+## Post-v1 Runtime Extension
+
+The post-v1 runtime workflow can also use:
+
+```bash
+cargo run -p xtask -- shell-check
+```
+
+This extends validation by:
+
+- injecting shell commands through the QEMU monitor
+- checking serial output for interactive shell responses
+- capturing a framebuffer dump for visual regression groundwork

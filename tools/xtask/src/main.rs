@@ -2,6 +2,8 @@ use std::env;
 use std::fs;
 use std::io;
 use std::io::Read;
+use std::io::Write;
+use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitCode, Stdio};
 use std::thread;
@@ -18,6 +20,7 @@ const LIMINE_BOOTX64_NAME: &str = "BOOTX64.EFI";
 const LIMINE_VARS_NAME: &str = "edk2-x86_64-vars.fd";
 const DEFAULT_BOOT_TIMEOUT_SECS: u64 = 20;
 const DEFAULT_BOOT_SUCCESS_MARKER: &str = "AetherOS: kernel initialized";
+const DEFAULT_MONITOR_PORT: u16 = 45454;
 
 fn main() -> ExitCode {
     match run() {
@@ -42,6 +45,7 @@ fn run() -> Result<(), String> {
         "stage" => stage_boot_tree(),
         "run" => run_qemu(args.any(|arg| arg == "--debug")),
         "boot-check" => verify_qemu_boot(),
+        "shell-check" => verify_qemu_shell(),
         "test" => run_workspace_tests(),
         other => Err(format!("unknown xtask command: {other}")),
     }
@@ -54,6 +58,7 @@ fn print_help() {
     println!("  stage    Build the kernel and stage a bootable UEFI tree");
     println!("  run      Stage assets and launch QEMU through Limine");
     println!("  boot-check  Run headless QEMU and verify boot success from serial logs");
+    println!("  shell-check Run QEMU, inject shell commands, and capture a framebuffer dump");
     println!("  test     Run formatting, host-safe tests, and kernel checks");
 }
 
@@ -183,6 +188,61 @@ fn verify_qemu_boot() -> Result<(), String> {
     }
 }
 
+fn verify_qemu_shell() -> Result<(), String> {
+    stage_boot_tree()?;
+
+    let root = workspace_root();
+    let serial_log = root.join(DIST_DIR).join("serial.log");
+    let screenshot = root.join(DIST_DIR).join("framebuffer-shell.ppm");
+    let success_marker = boot_success_marker();
+    let timeout = Duration::from_secs(boot_timeout_secs());
+    let monitor_port = qemu_monitor_port();
+
+    remove_if_exists(&serial_log)?;
+    remove_if_exists(&screenshot)?;
+
+    let serial_mode = format!("file:{}", serial_log.display());
+    let monitor_mode = format!("tcp:127.0.0.1:{monitor_port},server,nowait");
+    let mut command = build_qemu_command(&root, &serial_mode, "none")?;
+    command
+        .arg("-monitor")
+        .arg(&monitor_mode)
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped());
+
+    let mut child = command
+        .spawn()
+        .map_err(|err| format!("failed to start qemu-system-x86_64: {err}"))?;
+
+    let started = Instant::now();
+    wait_for_log_marker(&serial_log, &success_marker, timeout, &mut child)?;
+    wait_for_log_marker(&serial_log, "AetherOS shell ready", timeout, &mut child)?;
+
+    let mut monitor = connect_monitor(monitor_port, Duration::from_secs(5))?;
+    send_shell_command(&mut monitor, "help")?;
+    send_shell_command(&mut monitor, "info")?;
+    send_shell_command(&mut monitor, "ls")?;
+    send_monitor_command(
+        &mut monitor,
+        &format!("screendump {}", screenshot.display()),
+    )?;
+
+    wait_for_log_marker(&serial_log, "Show this command list", timeout, &mut child)?;
+    wait_for_log_marker(&serial_log, "AetherOS academic kernel", timeout, &mut child)?;
+    wait_for_log_marker(&serial_log, "/README.TXT", timeout, &mut child)?;
+
+    validate_ppm_screenshot(&screenshot)?;
+    terminate_child(&mut child)?;
+
+    println!(
+        "shell-check passed in {:.2}s. serial log: {} screenshot: {}",
+        started.elapsed().as_secs_f32(),
+        serial_log.display(),
+        screenshot.display()
+    );
+    Ok(())
+}
+
 fn run_workspace_tests() -> Result<(), String> {
     run_command(
         cargo_command()
@@ -210,6 +270,44 @@ fn run_workspace_tests() -> Result<(), String> {
             .current_dir(workspace_root()),
         "cargo test (host-safe packages)",
     )
+}
+
+fn wait_for_log_marker(
+    serial_log: &PathBuf,
+    marker: &str,
+    timeout: Duration,
+    child: &mut Child,
+) -> Result<(), String> {
+    let started = Instant::now();
+    loop {
+        if serial_log.contains_marker(marker)? {
+            return Ok(());
+        }
+
+        if let Some(status) = child
+            .try_wait()
+            .map_err(|err| format!("failed while polling QEMU status: {err}"))?
+        {
+            let stderr = read_child_stderr(child)?;
+            let tail = serial_log.tail_lines(20)?;
+            return Err(format!(
+                "QEMU exited before marker '{marker}'. status={status}. serial_tail=\n{tail}\nqemu_stderr=\n{stderr}"
+            ));
+        }
+
+        if started.elapsed() >= timeout {
+            let tail = serial_log.tail_lines(20)?;
+            terminate_child(child)?;
+            return Err(format!(
+                "timed out after {}s waiting for marker '{}'. serial_tail=\n{}",
+                timeout.as_secs(),
+                marker,
+                tail
+            ));
+        }
+
+        thread::sleep(Duration::from_millis(200));
+    }
 }
 
 fn build_qemu_command(
@@ -275,6 +373,88 @@ fn terminate_child(child: &mut Child) -> Result<(), String> {
         }
         Err(err) => Err(format!("failed to inspect QEMU process state: {err}")),
     }
+}
+
+fn connect_monitor(port: u16, timeout: Duration) -> Result<TcpStream, String> {
+    let started = Instant::now();
+    loop {
+        match TcpStream::connect(("127.0.0.1", port)) {
+            Ok(stream) => return Ok(stream),
+            Err(err) => {
+                if started.elapsed() >= timeout {
+                    return Err(format!(
+                        "failed to connect to QEMU monitor on port {port}: {err}"
+                    ));
+                }
+                thread::sleep(Duration::from_millis(200));
+            }
+        }
+    }
+}
+
+fn send_shell_command(stream: &mut TcpStream, command: &str) -> Result<(), String> {
+    for key in command.chars() {
+        send_monitor_command(stream, &format!("sendkey {}", qemu_sendkey_name(key)?))?;
+        thread::sleep(Duration::from_millis(40));
+    }
+    send_monitor_command(stream, "sendkey ret")?;
+    thread::sleep(Duration::from_millis(200));
+    Ok(())
+}
+
+fn send_monitor_command(stream: &mut TcpStream, command: &str) -> Result<(), String> {
+    stream
+        .write_all(command.as_bytes())
+        .and_then(|_| stream.write_all(b"\n"))
+        .map_err(|err| format!("failed to send monitor command '{command}': {err}"))
+}
+
+fn qemu_sendkey_name(ch: char) -> Result<String, String> {
+    let name = match ch {
+        'a'..='z' | '0'..='9' => ch.to_string(),
+        'A'..='Z' => format!("shift-{}", ch.to_ascii_lowercase()),
+        ' ' => "spc".to_string(),
+        '-' => "minus".to_string(),
+        '=' => "equal".to_string(),
+        '[' => "bracket_left".to_string(),
+        ']' => "bracket_right".to_string(),
+        ';' => "semicolon".to_string(),
+        '\'' => "apostrophe".to_string(),
+        ',' => "comma".to_string(),
+        '.' => "dot".to_string(),
+        '/' => "slash".to_string(),
+        '\\' => "backslash".to_string(),
+        _ => return Err(format!("unsupported shell-check key: {ch:?}")),
+    };
+
+    Ok(name)
+}
+
+fn validate_ppm_screenshot(path: &Path) -> Result<(), String> {
+    if !path.exists() {
+        return Err(format!(
+            "framebuffer dump was not created: {}",
+            path.display()
+        ));
+    }
+
+    let bytes = fs::read(path)
+        .map_err(|err| format!("failed to read framebuffer dump {}: {err}", path.display()))?;
+    if bytes.len() < 16 {
+        return Err(format!(
+            "framebuffer dump is unexpectedly small: {} bytes",
+            bytes.len()
+        ));
+    }
+
+    if !bytes.starts_with(b"P6") {
+        return Err(format!(
+            "framebuffer dump does not look like a binary PPM image: {}",
+            path.display()
+        ));
+    }
+
+    Ok(())
 }
 
 fn read_child_stderr(child: &mut Child) -> Result<String, String> {
@@ -513,6 +693,14 @@ fn qemu_serial_mode() -> String {
     env::var("AETHER_QEMU_SERIAL").unwrap_or_else(|_| "stdio".to_string())
 }
 
+fn qemu_monitor_port() -> u16 {
+    env::var("AETHER_QEMU_MONITOR_PORT")
+        .ok()
+        .and_then(|value| value.parse::<u16>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or(DEFAULT_MONITOR_PORT)
+}
+
 fn boot_timeout_secs() -> u64 {
     env::var("AETHER_BOOT_TIMEOUT_SECS")
         .ok()
@@ -585,4 +773,12 @@ impl SerialLogExt for PathBuf {
         let start = lines.len().saturating_sub(max_lines);
         Ok(lines[start..].join("\n"))
     }
+}
+
+fn remove_if_exists(path: &Path) -> Result<(), String> {
+    if path.exists() {
+        fs::remove_file(path)
+            .map_err(|err| format!("failed to remove {}: {err}", path.display()))?;
+    }
+    Ok(())
 }

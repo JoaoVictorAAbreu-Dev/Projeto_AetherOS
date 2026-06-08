@@ -21,3 +21,6 @@ run:
 
 boot-check:
     cargo run -p xtask -- boot-check
+
+shell-check:
+    cargo run -p xtask -- shell-check

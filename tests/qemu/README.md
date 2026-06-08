@@ -8,6 +8,7 @@ Use:
 
 ```bash
 cargo run -p xtask -- boot-check
+cargo run -p xtask -- shell-check
 ```
 
 This command:
@@ -17,6 +18,13 @@ This command:
 - writes serial output to `dist/serial.log`
 - waits for a success marker from the kernel
 - fails on timeout or early QEMU exit
+
+The shell interaction check additionally:
+
+- opens a QEMU monitor socket
+- injects `help`, `info`, and `ls`
+- verifies expected serial output from the shell
+- captures `dist/framebuffer-shell.ppm`
 
 ## Expected Success Marker
 
@@ -47,9 +55,10 @@ Covered:
 - kernel entry
 - boot-info collection
 - generic kernel initialization
+- scripted shell interaction through keyboard injection
+- framebuffer dump generation through QEMU screendump
 
 Not covered by the current boot gate:
 
-- automated shell interaction
-- keyboard IRQ input scripting
-- framebuffer screenshot assertions
+- broad keyboard layout coverage
+- semantic framebuffer content assertions beyond image existence/format
