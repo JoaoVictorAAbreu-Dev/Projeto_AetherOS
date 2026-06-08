@@ -74,6 +74,8 @@
 - Interrupt and scheduler baseline
 - Minimal syscall surface
 - Minimal interactive shell
+- More reliable keyboard input path for shell interaction
+- Clear scheduler/process observability without overstating process-management scope
 - Documented architecture and contributor workflow
 - Host-safe validation workflow for contributors and testers
 - Reproducible staged ESP boot assets through `xtask`

@@ -19,15 +19,31 @@ pub fn list_root_entries() -> &'static [&'static str] {
 }
 
 pub fn read(path: &str) -> Option<&'static str> {
-    find(path).map(|file| file.contents)
+    resolve(path).and_then(find).map(|file| file.contents)
 }
 
 pub fn exists(path: &str) -> bool {
-    find(path).is_some()
+    resolve(path).and_then(find).is_some()
 }
 
 fn find(path: &str) -> Option<&'static InitramfsFile> {
     crate::fs::initramfs::files()
         .iter()
         .find(|file| file.path == path)
+}
+
+fn resolve(path: &str) -> Option<&str> {
+    let normalized = if path.starts_with('/') {
+        path
+    } else {
+        match path {
+            "README.TXT" | "readme.txt" => "/README.TXT",
+            "STATUS.TXT" | "status.txt" => "/STATUS.TXT",
+            "ROADMAP.TXT" | "roadmap.txt" => "/ROADMAP.TXT",
+            "COMMANDS.TXT" | "commands.txt" => "/COMMANDS.TXT",
+            _ => return None,
+        }
+    };
+
+    Some(normalized)
 }

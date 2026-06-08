@@ -36,6 +36,14 @@ pub fn current_task_name() -> Option<&'static str> {
     SCHEDULER.lock().current_task().map(|task| task.name)
 }
 
+pub fn current_task_state() -> Option<ProcessState> {
+    SCHEDULER.lock().current_task().map(|task| task.state)
+}
+
+pub fn scheduling_model() -> &'static str {
+    "cooperative round-robin demo"
+}
+
 pub fn tick() {
     let mut scheduler = SCHEDULER.lock();
     scheduler.run_next();

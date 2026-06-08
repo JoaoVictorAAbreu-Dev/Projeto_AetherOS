@@ -21,15 +21,15 @@ fn build_initramfs() -> [InitramfsFile; INITRAMFS_FILE_COUNT] {
     [
         InitramfsFile {
             path: "/README.TXT",
-            contents: "AetherOS initramfs\nThis is the first in-memory filesystem.\n",
+            contents: "AetherOS initramfs\nStatic in-memory files for shell validation and boot-time inspection.\n",
         },
         InitramfsFile {
             path: "/STATUS.TXT",
-            contents: "Boot, interrupts, memory, scheduler, and shell foundations are active.\n",
+            contents: "Boot, interrupts, memory, scheduler, shell, and QEMU validation are active in this academic v1 baseline.\n",
         },
         InitramfsFile {
             path: "/ROADMAP.TXT",
-            contents: "Next milestones: refine VFS, improve shell, add QEMU validation.\n",
+            contents: "AetherOS v1 baseline is focused on stable bring-up, observability, and educational subsystem boundaries.\n",
         },
         InitramfsFile {
             path: "/COMMANDS.TXT",

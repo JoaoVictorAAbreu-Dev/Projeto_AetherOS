@@ -25,3 +25,13 @@ pub enum ProcessState {
     Running,
     Idle,
 }
+
+impl ProcessState {
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Ready => "ready",
+            Self::Running => "running",
+            Self::Idle => "idle",
+        }
+    }
+}

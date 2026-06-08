@@ -49,5 +49,9 @@ pub fn initialize(boot_info: &BootInfo) {
         "AetherOS: current task = {:?}",
         crate::task::scheduler::current_task_name()
     );
+    crate::println!(
+        "AetherOS: scheduler model = {}",
+        crate::task::scheduler::scheduling_model()
+    );
     crate::println!("AetherOS: interrupts enabled");
 }

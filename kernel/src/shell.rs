@@ -1,6 +1,6 @@
 use spin::Mutex;
 
-use crate::drivers::keyboard;
+use crate::drivers::keyboard::{self, KeyEvent};
 
 const MAX_LINE_LEN: usize = 128;
 
@@ -11,9 +11,9 @@ pub fn initialize() {
     shell.initialize();
 }
 
-pub fn on_key(character: char) {
+pub fn on_key(event: KeyEvent) {
     let mut shell = SHELL.lock();
-    shell.on_key(character);
+    shell.on_key(event);
 }
 
 struct Shell {
@@ -42,28 +42,33 @@ impl Shell {
         self.prompt();
     }
 
-    fn on_key(&mut self, character: char) {
+    fn on_key(&mut self, event: KeyEvent) {
         if !self.initialized {
             return;
         }
 
-        match character {
-            '\n' => {
+        match event {
+            KeyEvent::Enter => {
                 crate::print!("\n");
                 self.execute_current_line();
                 self.prompt();
             }
-            '\u{8}' => {
+            KeyEvent::Backspace => {
                 if self.len > 0 {
                     self.len -= 1;
                     crate::print!("\u{8} \u{8}");
                 }
             }
-            _ => {
+            KeyEvent::Char(character) => {
                 if self.len < MAX_LINE_LEN {
                     self.line_buffer[self.len] = character as u8;
                     self.len += 1;
                     crate::print!("{}", character);
+                } else {
+                    crate::print!("\n");
+                    crate::println!("input too long");
+                    self.len = 0;
+                    self.prompt();
                 }
             }
         }
@@ -102,15 +107,33 @@ fn execute_command(command: &str) {
 
     match head {
         "help" => {
-            crate::println!("commands: help, info, ticks, mem, tasks, ls, cat <FILE>, clear");
+            crate::println!("commands:");
+            crate::println!("  help        Show this command list");
+            crate::println!("  info        Show kernel and keyboard status");
+            crate::println!("  ticks       Show PIT tick counter");
+            crate::println!("  mem         Show frame allocator and heap status");
+            crate::println!("  tasks       Show scheduler task summary");
+            crate::println!("  ls          List initramfs root entries");
+            crate::println!("  cat <FILE>  Read an initramfs file");
+            crate::println!("  clear       Redraw the framebuffer shell surface");
         }
         "info" => {
             crate::println!("AetherOS academic kernel");
             crate::println!("keyboard initialized = {}", keyboard::is_initialized());
+            crate::println!(
+                "scheduler model = {}",
+                crate::task::scheduler::scheduling_model()
+            );
             crate::println!("task count = {}", crate::task::scheduler::task_count());
             crate::println!(
                 "current task = {:?}",
                 crate::task::scheduler::current_task_name()
+            );
+            crate::println!(
+                "current task state = {}",
+                crate::task::scheduler::current_task_state()
+                    .map(|state| state.label())
+                    .unwrap_or("unavailable")
             );
         }
         "ticks" => {
@@ -129,10 +152,20 @@ fn execute_command(command: &str) {
             crate::println!("heap used = {}", crate::memory::heap::heap_used());
         }
         "tasks" => {
+            crate::println!(
+                "scheduler model = {}",
+                crate::task::scheduler::scheduling_model()
+            );
             crate::println!("task count = {}", crate::task::scheduler::task_count());
             crate::println!(
                 "current task = {:?}",
                 crate::task::scheduler::current_task_name()
+            );
+            crate::println!(
+                "current task state = {}",
+                crate::task::scheduler::current_task_state()
+                    .map(|state| state.label())
+                    .unwrap_or("unavailable")
             );
         }
         "ls" => {
@@ -146,11 +179,9 @@ fn execute_command(command: &str) {
                 return;
             };
 
-            let normalized = normalize_path(path);
-
-            match crate::fs::vfs::read(normalized) {
+            match crate::fs::vfs::read(path) {
                 Some(contents) => crate::println!("{}", contents),
-                None => crate::println!("file not found"),
+                None => crate::println!("file not found: {}", path),
             }
         }
         "clear" => {
@@ -158,19 +189,5 @@ fn execute_command(command: &str) {
             crate::println!("screen redrawn");
         }
         _ => crate::println!("unknown command: {}", command),
-    }
-}
-
-fn normalize_path(path: &str) -> &str {
-    if path.starts_with('/') {
-        path
-    } else {
-        match path {
-            "README.TXT" => "/README.TXT",
-            "STATUS.TXT" => "/STATUS.TXT",
-            "ROADMAP.TXT" => "/ROADMAP.TXT",
-            "COMMANDS.TXT" => "/COMMANDS.TXT",
-            _ => path,
-        }
     }
 }

@@ -29,6 +29,17 @@ The first AetherOS shell is intentionally simple. It is a kernel-resident intera
 - `cat <FILE>`
 - `clear`
 
+## Input Model
+
+The shell currently accepts:
+
+- printable keyboard characters
+- Enter
+- Backspace
+- basic Shift-modified input for uppercase letters and common punctuation
+
+Path lookup for `cat <FILE>` is resolved by the VFS layer so command parsing does not hardcode individual filename aliases.
+
 ## Why This Design
 
 This shell is not meant to be final. It is meant to prove that the kernel can accept input, preserve state, read from a filesystem abstraction, and expose meaningful runtime information through a stable interactive path.

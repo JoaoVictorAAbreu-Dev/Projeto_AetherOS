@@ -47,6 +47,8 @@ For QEMU runtime capture:
 - timer interrupts generate ticks
 - keyboard input reaches the shell
 - shell commands `help`, `ls`, `cat`, `mem`, and `tasks` work
+- Shift-modified input and backspace behave consistently during shell entry
+- scheduler output clearly reports its cooperative demo model and current task state
 
 ## Current Automated Smoke Tests
 
