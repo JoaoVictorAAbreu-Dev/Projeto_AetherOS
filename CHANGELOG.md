@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - Pending Release Tag
+## [1.0.0] - 2026-06-08
 
 ### Added
 
@@ -24,3 +24,17 @@ All notable changes to this project will be documented in this file.
 - Early boot-stage markers and panic-stage reporting for bring-up diagnostics
 - Stabilized keyboard input path with Shift-aware shell input
 - Cleaner VFS-backed shell file reads and clearer scheduler observability
+
+### Validation
+
+- `cargo +nightly-x86_64-pc-windows-gnu fmt --all`
+- `cargo +nightly-x86_64-pc-windows-gnu check --workspace`
+- `cargo run -p xtask -- test`
+- `cargo run -p xtask -- stage`
+- `cargo run -p xtask -- boot-check`
+
+### Scope Notes
+
+- v1 focuses on stable bring-up, observability, and educational subsystem boundaries
+- user-mode process execution remains out of scope for this release
+- persistent storage and advanced driver coverage remain out of scope for this release
