@@ -639,9 +639,19 @@ fn find_qemu_binary() -> Option<String> {
 }
 
 fn find_ovmf_code() -> Option<PathBuf> {
+    if let Some(path) = env_path("AETHER_OVMF_CODE") {
+        return Some(path);
+    }
+
     let candidates = [
         PathBuf::from(r"C:\Program Files\qemu\share\edk2-x86_64-code.fd"),
         PathBuf::from("/usr/share/OVMF/OVMF_CODE.fd"),
+        PathBuf::from("/usr/share/OVMF/OVMF_CODE_4M.fd"),
+        PathBuf::from("/usr/share/OVMF/OVMF_CODE.secboot.fd"),
+        PathBuf::from("/usr/share/edk2/ovmf/OVMF_CODE.fd"),
+        PathBuf::from("/usr/share/edk2/ovmf/OVMF_CODE_4M.fd"),
+        PathBuf::from("/usr/share/qemu/OVMF_CODE.fd"),
+        PathBuf::from("/usr/share/qemu/OVMF_CODE_4M.fd"),
         PathBuf::from("/usr/share/edk2/x64/OVMF_CODE.fd"),
         PathBuf::from("/opt/homebrew/share/qemu/edk2-x86_64-code.fd"),
     ];
@@ -676,9 +686,18 @@ fn ensure_ovmf_vars(root: &Path) -> Result<PathBuf, String> {
 }
 
 fn find_ovmf_vars_source() -> Option<PathBuf> {
+    if let Some(path) = env_path("AETHER_OVMF_VARS") {
+        return Some(path);
+    }
+
     let candidates = [
         PathBuf::from(r"C:\Program Files\qemu\share\edk2-i386-vars.fd"),
         PathBuf::from("/usr/share/OVMF/OVMF_VARS.fd"),
+        PathBuf::from("/usr/share/OVMF/OVMF_VARS_4M.fd"),
+        PathBuf::from("/usr/share/edk2/ovmf/OVMF_VARS.fd"),
+        PathBuf::from("/usr/share/edk2/ovmf/OVMF_VARS_4M.fd"),
+        PathBuf::from("/usr/share/qemu/OVMF_VARS.fd"),
+        PathBuf::from("/usr/share/qemu/OVMF_VARS_4M.fd"),
         PathBuf::from("/usr/share/edk2/x64/OVMF_VARS.fd"),
     ];
 
@@ -744,6 +763,12 @@ fn preferred_rustup_toolchain() -> Option<String> {
     } else {
         Some("nightly".to_string())
     }
+}
+
+fn env_path(name: &str) -> Option<PathBuf> {
+    env::var_os(name)
+        .map(PathBuf::from)
+        .filter(|path| path.exists())
 }
 
 trait SerialLogExt {
