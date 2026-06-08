@@ -1,4 +1,5 @@
 use core::fmt;
+use core::fmt::Write;
 
 use spin::{Mutex, Once};
 use x86_64::instructions::port::Port;

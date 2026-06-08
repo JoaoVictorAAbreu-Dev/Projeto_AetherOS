@@ -9,7 +9,12 @@ pub fn initialize() {
 }
 
 pub fn list_root_entries() -> &'static [&'static str] {
-    static ROOT_ENTRIES: [&str; 4] = ["/README.TXT", "/STATUS.TXT", "/ROADMAP.TXT", "/COMMANDS.TXT"];
+    static ROOT_ENTRIES: [&str; 4] = [
+        "/README.TXT",
+        "/STATUS.TXT",
+        "/ROADMAP.TXT",
+        "/COMMANDS.TXT",
+    ];
     &ROOT_ENTRIES
 }
 

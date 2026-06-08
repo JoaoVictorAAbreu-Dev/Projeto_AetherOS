@@ -108,7 +108,10 @@ fn execute_command(command: &str) {
             crate::println!("AetherOS academic kernel");
             crate::println!("keyboard initialized = {}", keyboard::is_initialized());
             crate::println!("task count = {}", crate::task::scheduler::task_count());
-            crate::println!("current task = {:?}", crate::task::scheduler::current_task_name());
+            crate::println!(
+                "current task = {:?}",
+                crate::task::scheduler::current_task_name()
+            );
         }
         "ticks" => {
             crate::println!("ticks = {}", crate::drivers::timer::ticks());
@@ -127,7 +130,10 @@ fn execute_command(command: &str) {
         }
         "tasks" => {
             crate::println!("task count = {}", crate::task::scheduler::task_count());
-            crate::println!("current task = {:?}", crate::task::scheduler::current_task_name());
+            crate::println!(
+                "current task = {:?}",
+                crate::task::scheduler::current_task_name()
+            );
         }
         "ls" => {
             for name in crate::fs::vfs::list_root_entries() {

@@ -1,19 +1,8 @@
 use aether_bootinfo::{
-    BootInfo,
-    FramebufferInfo,
-    MemoryRegion,
-    MemoryRegionKind,
-    MAX_MEMORY_REGIONS,
+    BootInfo, FramebufferInfo, MemoryRegion, MemoryRegionKind, MAX_MEMORY_REGIONS,
 };
-use limine::request::{
-    FramebufferRequest,
-    HhdmRequest,
-    MemoryMapRequest,
-    RequestsEndMarker,
-    RequestsStartMarker,
-    StackSizeRequest,
-};
-use limine::BaseRevision;
+use limine::request::{FramebufferRequest, HhdmRequest, MemmapRequest, StackSizeRequest};
+use limine::{BaseRevision, RequestsEndMarker, RequestsStartMarker};
 use spin::Once;
 
 use crate::arch::x86_64::serial;
@@ -28,7 +17,7 @@ static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
 #[used]
 #[unsafe(link_section = ".limine_requests")]
-static MEMORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
+static MEMORY_MAP_REQUEST: MemmapRequest = MemmapRequest::new();
 
 #[used]
 #[unsafe(link_section = ".limine_requests")]
@@ -36,7 +25,7 @@ static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
 #[used]
 #[unsafe(link_section = ".limine_requests")]
-static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(1024 * 1024);
+static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new(1024 * 1024);
 
 #[used]
 #[unsafe(link_section = ".limine_requests_start")]
@@ -65,36 +54,41 @@ pub fn enter() -> ! {
 
 fn collect_boot_info() -> BootInfo {
     let hhdm_response = HHDM_REQUEST
-        .get_response()
+        .response()
         .expect("Limine did not provide an HHDM response");
     let memory_map_response = MEMORY_MAP_REQUEST
-        .get_response()
+        .response()
         .expect("Limine did not provide a memory map response");
     let mut regions = [MemoryRegion::EMPTY; MAX_MEMORY_REGIONS];
 
-    for (index, entry) in memory_map_response.entries().iter().take(MAX_MEMORY_REGIONS).enumerate() {
+    for (index, entry) in memory_map_response
+        .entries()
+        .iter()
+        .take(MAX_MEMORY_REGIONS)
+        .enumerate()
+    {
         regions[index] = MemoryRegion::new(
-            entry.base(),
-            entry.length(),
-            classify_memory_region(entry.entry_type() as u64),
+            entry.base,
+            entry.length,
+            classify_memory_region(entry.type_),
         );
     }
 
     let framebuffer = FRAMEBUFFER_REQUEST
-        .get_response()
-        .and_then(|response| response.framebuffers().next())
+        .response()
+        .and_then(|response| response.framebuffers().first().copied())
         .map(|framebuffer| {
             FramebufferInfo::new(
-                framebuffer.addr() as u64,
-                framebuffer.width() as u32,
-                framebuffer.height() as u32,
-                framebuffer.pitch() as u32,
-                framebuffer.bpp(),
+                framebuffer.address() as u64,
+                framebuffer.width as u32,
+                framebuffer.height as u32,
+                framebuffer.pitch as u32,
+                framebuffer.bpp,
             )
         });
 
     BootInfo::new(
-        hhdm_response.offset() as u64,
+        hhdm_response.offset,
         memory_map_response.entries().len(),
         framebuffer,
         regions,

@@ -1,4 +1,6 @@
-use aether_bootinfo::{BootInfo, FramebufferInfo, MemoryRegion, MemoryRegionKind, MAX_MEMORY_REGIONS};
+use aether_bootinfo::{
+    BootInfo, FramebufferInfo, MemoryRegion, MemoryRegionKind, MAX_MEMORY_REGIONS,
+};
 
 #[test]
 fn boot_info_stores_framebuffer_and_memory_regions() {

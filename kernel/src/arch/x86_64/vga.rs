@@ -21,7 +21,13 @@ pub fn render_boot_visual(framebuffer: FramebufferInfo) {
     let mut display = FramebufferDisplay::new(framebuffer);
     display.clear(BACKGROUND);
     display.fill_rect(0, 0, framebuffer.width, 28, ACCENT_MUTED);
-    display.fill_rect(0, framebuffer.height.saturating_sub(18), framebuffer.width, 18, PANEL);
+    display.fill_rect(
+        0,
+        framebuffer.height.saturating_sub(18),
+        framebuffer.width,
+        18,
+        PANEL,
+    );
 
     let panel_width = framebuffer.width.saturating_sub(120);
     let panel_height = framebuffer.height.min(220);
@@ -31,7 +37,13 @@ pub fn render_boot_visual(framebuffer: FramebufferInfo) {
     display.fill_rect(panel_x, panel_y, panel_width, panel_height, PANEL);
     display.stroke_rect(panel_x, panel_y, panel_width, panel_height, 4, PANEL_BORDER);
 
-    display.fill_rect(panel_x + 28, panel_y + 28, panel_width.saturating_sub(56), 10, ACCENT);
+    display.fill_rect(
+        panel_x + 28,
+        panel_y + 28,
+        panel_width.saturating_sub(56),
+        10,
+        ACCENT,
+    );
     display.fill_rect(
         panel_x + 28,
         panel_y + 58,
@@ -61,9 +73,25 @@ pub fn render_boot_visual(framebuffer: FramebufferInfo) {
         ACCENT_MUTED,
     );
 
-    display.draw_mark(panel_x + panel_width.saturating_sub(84), panel_y + 38, 36, ACCENT);
-    display.draw_progress(panel_x + 28, panel_y + panel_height.saturating_sub(42), panel_width.saturating_sub(56), 12);
-    display.fill_rect(64, framebuffer.height.saturating_sub(84), framebuffer.width.saturating_sub(128), 48, 0x0A0F1D);
+    display.draw_mark(
+        panel_x + panel_width.saturating_sub(84),
+        panel_y + 38,
+        36,
+        ACCENT,
+    );
+    display.draw_progress(
+        panel_x + 28,
+        panel_y + panel_height.saturating_sub(42),
+        panel_width.saturating_sub(56),
+        12,
+    );
+    display.fill_rect(
+        64,
+        framebuffer.height.saturating_sub(84),
+        framebuffer.width.saturating_sub(128),
+        48,
+        0x0A0F1D,
+    );
 }
 
 struct FramebufferDisplay {
@@ -81,16 +109,34 @@ impl FramebufferDisplay {
 
     fn stroke_rect(&mut self, x: u32, y: u32, width: u32, height: u32, thickness: u32, color: u32) {
         self.fill_rect(x, y, width, thickness, color);
-        self.fill_rect(x, y + height.saturating_sub(thickness), width, thickness, color);
+        self.fill_rect(
+            x,
+            y + height.saturating_sub(thickness),
+            width,
+            thickness,
+            color,
+        );
         self.fill_rect(x, y, thickness, height, color);
-        self.fill_rect(x + width.saturating_sub(thickness), y, thickness, height, color);
+        self.fill_rect(
+            x + width.saturating_sub(thickness),
+            y,
+            thickness,
+            height,
+            color,
+        );
     }
 
     fn draw_mark(&mut self, x: u32, y: u32, size: u32, color: u32) {
         let third = size / 3;
         self.fill_rect(x, y + third, third, size.saturating_sub(third), color);
         self.fill_rect(x + third, y, third, size, color);
-        self.fill_rect(x + (third * 2), y + third, third, size.saturating_sub(third), color);
+        self.fill_rect(
+            x + (third * 2),
+            y + third,
+            third,
+            size.saturating_sub(third),
+            color,
+        );
     }
 
     fn draw_progress(&mut self, x: u32, y: u32, width: u32, height: u32) {
@@ -101,7 +147,13 @@ impl FramebufferDisplay {
 
         let marker_width = 14;
         let marker_x = x + filled.saturating_sub(marker_width / 2);
-        self.fill_rect(marker_x, y.saturating_sub(4), marker_width, height + 8, SUCCESS);
+        self.fill_rect(
+            marker_x,
+            y.saturating_sub(4),
+            marker_width,
+            height + 8,
+            SUCCESS,
+        );
     }
 
     fn fill_rect(&mut self, x: u32, y: u32, width: u32, height: u32, color: u32) {

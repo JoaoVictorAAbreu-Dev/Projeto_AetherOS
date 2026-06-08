@@ -15,11 +15,11 @@ pub fn initialize(boot_info: &BootInfo) {
     let mut range_count = 0usize;
     let mut total_frames = 0usize;
 
-    for region in boot_info
-        .memory_regions
-        .iter()
-        .take(boot_info.memory_map_entries.min(boot_info.memory_regions.len()))
-    {
+    for region in boot_info.memory_regions.iter().take(
+        boot_info
+            .memory_map_entries
+            .min(boot_info.memory_regions.len()),
+    ) {
         if region.kind != MemoryRegionKind::Usable || region.length < FRAME_SIZE {
             continue;
         }
@@ -130,7 +130,8 @@ impl FrameAllocator {
         let next_range = range_index + 1;
 
         if next_range >= self.range_count {
-            self.current_range.store(self.range_count, Ordering::Release);
+            self.current_range
+                .store(self.range_count, Ordering::Release);
             return false;
         }
 

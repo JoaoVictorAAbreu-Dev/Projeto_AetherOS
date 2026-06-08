@@ -1,7 +1,4 @@
-[build]
-target = "config/target/x86_64-aetheros.json"
-
-[target.'config/target/x86_64-aetheros.json']
+[target.'cfg(target_os = "none")']
 rustflags = [
     "-C",
     "link-arg=-Tconfig/linker/linker.ld",

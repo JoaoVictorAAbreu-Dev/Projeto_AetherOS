@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(abi_x86_interrupt)]
 
 use aether_bootinfo::BootInfo;
 use x86_64::instructions::hlt;
@@ -8,11 +9,11 @@ pub mod core;
 pub mod drivers;
 pub mod fs;
 pub mod memory;
+pub mod shell;
 pub mod sync;
 pub mod syscall;
 pub mod task;
 pub mod utils;
-pub mod shell;
 
 pub fn run(boot_info: &'static BootInfo) -> ! {
     core::init::initialize(boot_info);

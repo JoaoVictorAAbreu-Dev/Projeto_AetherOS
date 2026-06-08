@@ -68,9 +68,11 @@
 
 ## v1.0.0 - Academic Stable Base
 
-- Stable boot flow
+- Stable UEFI + Limine boot flow on QEMU
 - Core memory subsystem
 - Interrupt and scheduler baseline
 - Minimal syscall surface
 - Minimal interactive shell
 - Documented architecture and contributor workflow
+- Host-safe validation workflow for contributors and testers
+- Reproducible staged ESP boot assets through `xtask`

@@ -3,17 +3,14 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use spin::Mutex;
 use x86_64::instructions::interrupts as cpu_interrupts;
 use x86_64::registers::control::Cr2;
-use x86_64::structures::idt::{
-    InterruptStackFrame,
-    PageFaultErrorCode,
-};
+use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
 
 use crate::arch::x86_64::pit;
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
-static PICS: Mutex<ChainedPics> = Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
+static PICS: Mutex<ChainedPics> = Mutex::new(ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET));
 static INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 #[derive(Clone, Copy)]
@@ -48,7 +45,7 @@ pub fn init() {
 
 pub extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
     crate::println!("AetherOS: breakpoint exception");
-    crate::println!("{stack_frame:#?}");
+    crate::println!("{:#?}", stack_frame);
 }
 
 pub extern "x86-interrupt" fn double_fault_handler(
@@ -56,7 +53,7 @@ pub extern "x86-interrupt" fn double_fault_handler(
     error_code: u64,
 ) -> ! {
     crate::println!("AetherOS: double fault, error_code={}", error_code);
-    crate::println!("{stack_frame:#?}");
+    crate::println!("{:#?}", stack_frame);
     crate::core::panic::halt_forever()
 }
 
@@ -64,8 +61,11 @@ pub extern "x86-interrupt" fn general_protection_fault_handler(
     stack_frame: InterruptStackFrame,
     error_code: u64,
 ) {
-    crate::println!("AetherOS: general protection fault, error_code={}", error_code);
-    crate::println!("{stack_frame:#?}");
+    crate::println!(
+        "AetherOS: general protection fault, error_code={}",
+        error_code
+    );
+    crate::println!("{:#?}", stack_frame);
     crate::core::panic::halt_forever()
 }
 
@@ -75,7 +75,7 @@ pub extern "x86-interrupt" fn page_fault_handler(
 ) {
     crate::println!("AetherOS: page fault accessing {:?}", Cr2::read());
     crate::println!("AetherOS: page fault error_code={:?}", error_code);
-    crate::println!("{stack_frame:#?}");
+    crate::println!("{:#?}", stack_frame);
     crate::core::panic::halt_forever()
 }
 

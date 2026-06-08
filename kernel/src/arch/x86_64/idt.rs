@@ -11,7 +11,8 @@ pub fn init() {
 
 fn build_idt() -> InterruptDescriptorTable {
     let mut idt = InterruptDescriptorTable::new();
-    idt.breakpoint.set_handler_fn(interrupts::breakpoint_handler);
+    idt.breakpoint
+        .set_handler_fn(interrupts::breakpoint_handler);
     unsafe {
         idt.double_fault
             .set_handler_fn(interrupts::double_fault_handler)
@@ -21,9 +22,9 @@ fn build_idt() -> InterruptDescriptorTable {
         .set_handler_fn(interrupts::general_protection_fault_handler);
     idt.page_fault
         .set_handler_fn(interrupts::page_fault_handler);
-    idt[interrupts::InterruptIndex::Timer.as_usize()]
+    idt[interrupts::InterruptIndex::Timer.as_u8()]
         .set_handler_fn(interrupts::timer_interrupt_handler);
-    idt[interrupts::InterruptIndex::Keyboard.as_usize()]
+    idt[interrupts::InterruptIndex::Keyboard.as_u8()]
         .set_handler_fn(interrupts::keyboard_interrupt_handler);
     idt
 }

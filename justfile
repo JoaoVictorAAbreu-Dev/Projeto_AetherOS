@@ -5,10 +5,10 @@ fmt:
     cargo fmt --all
 
 check:
-    cargo check --workspace
+    cargo run -p xtask -- test
 
 test:
-    cargo test --workspace
+    cargo run -p xtask -- test
 
 build:
     cargo run -p xtask -- build

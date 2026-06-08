@@ -30,12 +30,13 @@ The repository already includes:
 
 - Cargo workspace organization
 - initial architecture and development documentation
-- Limine-based boot strategy
+- Limine-based UEFI boot strategy
 - real boot entry skeleton
 - early serial-first diagnostics
 - boot metadata handoff via `BootInfo`
 - initial framebuffer-based visual boot stage
 - initial in-kernel shell and in-memory initramfs/VFS path
+- automated `xtask` flow for build, staging, test, and QEMU boot
 
 Current implementation priority follows this fixed order:
 
@@ -72,30 +73,30 @@ Current implementation priority follows this fixed order:
 
 ```mermaid
 flowchart TD
-    A["Firmware / Bootloader"] --> B["Limine Requests"]
-    B --> C["Kernel Entry (_start)"]
-    C --> D["Boot Layer"]
+    A["Firmware / UEFI"] --> B["Limine EFI Loader"]
+    B --> C["Limine Requests"]
+    C --> D["Kernel Entry (_start)"]
     D --> E["Serial Diagnostics"]
     D --> F["BootInfo Handoff"]
     F --> G["Kernel Core Init"]
     G --> H["Memory Management"]
     G --> I["Interrupts"]
-    G --> J["Tasking and Syscalls"]
+    G --> J["Tasking, VFS, and Shell"]
 ```
 
 ## Repository Layout
 
 ```text
 AetherOS/
-├─ boot/        # Boot protocol notes and boot assets
-├─ config/      # Linker, target, QEMU, and boot configuration
-├─ crates/      # Shared no_std support crates
-├─ docs/        # Architecture, setup, tutorials, roadmap, and references
-├─ kernel/      # Kernel source tree
-├─ scripts/     # Local helper scripts
-├─ tests/       # Integration and QEMU-oriented tests
-├─ tools/       # Project tooling and future build helpers
-└─ user/        # Future userland-facing artifacts
+|-- boot/        # Boot protocol notes and boot assets
+|-- config/      # Linker, target, QEMU, and boot configuration
+|-- crates/      # Shared no_std support crates
+|-- docs/        # Architecture, setup, tutorials, roadmap, and references
+|-- kernel/      # Kernel source tree
+|-- scripts/     # Local helper scripts
+|-- tests/       # Integration and QEMU-oriented tests
+|-- tools/       # Project tooling and future build helpers
+`-- user/        # Future userland-facing artifacts
 ```
 
 ## Quick Start
@@ -103,24 +104,40 @@ AetherOS/
 ### Prerequisites
 
 - Rust nightly
+- On Windows, prefer `nightly-x86_64-pc-windows-gnu`
 - `rust-src`
 - `llvm-tools-preview`
-- QEMU
-- Limine tooling
+- QEMU with `edk2-x86_64` firmware
+- Internet access on the first `xtask run` to download the Limine binary bundle
 
 ### Initial Validation
 
 ```bash
-cargo fmt --all
-cargo check --workspace
-cargo test --workspace
+cargo run -p xtask -- test
 ```
+
+### First Boot In QEMU
+
+```bash
+cargo run -p xtask -- run
+```
+
+Notes:
+
+- The first `run` downloads the official Limine binary bundle into `dist/limine/`.
+- The boot flow uses UEFI firmware plus a FAT-backed ESP directory, not `qemu -kernel`.
+- On headless environments, set `AETHER_QEMU_DISPLAY=none`.
+- To redirect serial logs, set `AETHER_QEMU_SERIAL=file:dist/serial.log`.
 
 PowerShell helpers are available in [`scripts/`](scripts):
 
 - `scripts/setup.ps1`
 - `scripts/test.ps1`
 - `scripts/run-qemu.ps1`
+
+Windows note:
+
+- The PowerShell scripts use `cargo +nightly-x86_64-pc-windows-gnu` to avoid requiring the MSVC linker.
 
 ### Where to Start Reading
 
@@ -145,10 +162,10 @@ AetherOS is intentionally structured to help readers answer questions like:
 To improve educational reach and GitHub appeal, the recommended showcase sequence is:
 
 1. serial boot log capture GIF
-2. VGA text output demo
+2. framebuffer boot status GIF
 3. keyboard input echo demo
 4. interrupt tick visualization
-5. memory map inspection walkthrough
+5. shell walkthrough with `help`, `ls`, `cat`, `mem`, and `tasks`
 
 A prepared plan for demos, GIFs, and release assets lives in [docs/showcase/demo-plan.md](docs/showcase/demo-plan.md).
 
@@ -187,6 +204,17 @@ New contributors should start here:
 ## Releases
 
 The project should use milestone-based educational releases instead of arbitrary version bumps. A release checklist is prepared in [docs/showcase/release-checklist.md](docs/showcase/release-checklist.md).
+
+## v1 Baseline
+
+Version `1.0.0` is defined as:
+
+- booting through Limine on QEMU in an architecture-correct path
+- reaching kernel bring-up with serial diagnostics
+- exposing framebuffer status output when available
+- accepting keyboard input into the in-kernel shell
+- providing timer ticks, memory inspection, task inspection, and initramfs-backed file reads
+- shipping reproducible build/test/run documentation for external testers
 
 ## Community Health
 

@@ -9,7 +9,7 @@ if (-not $cargo) {
 }
 
 if ($Debug) {
-    cargo run -p xtask -- run --debug
+    cargo +nightly-x86_64-pc-windows-gnu run -p xtask -- run --debug
 } else {
-    cargo run -p xtask -- run
+    cargo +nightly-x86_64-pc-windows-gnu run -p xtask -- run
 }

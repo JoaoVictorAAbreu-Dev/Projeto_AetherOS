@@ -9,7 +9,24 @@
 
 ## Current Status
 
-The repository now includes real kernel bring-up stages plus a minimal shell and in-memory VFS. In this environment, however, Rust and QEMU are still unavailable, so runtime validation remains pending here.
+The repository now includes real kernel bring-up stages plus a minimal shell and in-memory VFS. Host validation and runtime validation are intentionally split because the kernel crate is `no_std` and targets a custom `x86_64-aetheros` JSON target instead of the host ABI.
+
+## Current Automated Validation
+
+```bash
+cargo run -p xtask -- test
+```
+
+This command currently performs:
+
+- `cargo fmt --all -- --check`
+- `cargo +nightly check --workspace`
+- `cargo +nightly test -p aether-bootinfo -p xtask`
+
+For QEMU runtime capture:
+
+- `AETHER_QEMU_DISPLAY=none`
+- `AETHER_QEMU_SERIAL=file:dist/serial.log`
 
 ## Current Manual Validation Targets
 
@@ -23,5 +40,4 @@ The repository now includes real kernel bring-up stages plus a minimal shell and
 ## Current Automated Smoke Tests
 
 - boot-info structure test
-- interrupt index offset test
-- memory-region and higher-half mapping test
+- workspace tooling smoke test

@@ -102,6 +102,8 @@ impl Scheduler {
     }
 
     fn current_task_id(&self) -> usize {
-        self.current_task().map(|task| task.id).unwrap_or(usize::MAX)
+        self.current_task()
+            .map(|task| task.id)
+            .unwrap_or(usize::MAX)
     }
 }

@@ -5,5 +5,5 @@ if (-not $cargo) {
 }
 
 Write-Host "Running AetherOS workspace checks through xtask..."
-cargo run -p xtask -- test
+cargo +nightly-x86_64-pc-windows-gnu run -p xtask -- test
 exit $LASTEXITCODE
