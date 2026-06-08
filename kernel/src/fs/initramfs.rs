@@ -33,7 +33,7 @@ fn build_initramfs() -> [InitramfsFile; INITRAMFS_FILE_COUNT] {
         },
         InitramfsFile {
             path: "/COMMANDS.TXT",
-            contents: "help\ninfo\nticks\nmem\ntasks\nls\ncat <FILE>\nclear\n",
+            contents: "help\ninfo\nticks\nmem\ntasks\nls\ncat <FILE>\nwrite <FILE> <TEXT>\nrm <FILE>\nstorage\nclear\n",
         },
     ]
 }

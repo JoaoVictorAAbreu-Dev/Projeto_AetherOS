@@ -27,6 +27,9 @@ The first AetherOS shell is intentionally simple. It is a kernel-resident intera
 - `tasks`
 - `ls`
 - `cat <FILE>`
+- `write <FILE> <TEXT>`
+- `rm <FILE>`
+- `storage`
 - `clear`
 
 ## Input Model
@@ -39,6 +42,8 @@ The shell currently accepts:
 - basic Shift-modified input for uppercase letters and common punctuation
 
 Path lookup for `cat <FILE>` is resolved by the VFS layer so command parsing does not hardcode individual filename aliases.
+
+The shell can now write and remove files through a writable in-memory VFS overlay. This remains non-persistent by design and exists to validate the filesystem boundary before disk-backed persistence is introduced.
 
 ## Why This Design
 

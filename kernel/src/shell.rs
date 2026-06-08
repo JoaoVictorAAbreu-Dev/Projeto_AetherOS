@@ -113,8 +113,11 @@ fn execute_command(command: &str) {
             crate::println!("  ticks       Show PIT tick counter");
             crate::println!("  mem         Show frame allocator and heap status");
             crate::println!("  tasks       Show scheduler task summary");
-            crate::println!("  ls          List initramfs root entries");
-            crate::println!("  cat <FILE>  Read an initramfs file");
+            crate::println!("  ls          List VFS root entries");
+            crate::println!("  cat <FILE>  Read a VFS file");
+            crate::println!("  write <FILE> <TEXT>  Create or update a writable overlay file");
+            crate::println!("  rm <FILE>   Remove a writable overlay file");
+            crate::println!("  storage     Show storage boundary status");
             crate::println!("  clear       Redraw the framebuffer shell surface");
         }
         "info" => {
@@ -169,9 +172,9 @@ fn execute_command(command: &str) {
             );
         }
         "ls" => {
-            for name in crate::fs::vfs::list_root_entries() {
+            crate::fs::vfs::for_each_entry(|name| {
                 crate::println!("{}", name);
-            }
+            });
         }
         "cat" => {
             let Some(path) = parts.next() else {
@@ -183,6 +186,39 @@ fn execute_command(command: &str) {
                 Some(contents) => crate::println!("{}", contents),
                 None => crate::println!("file not found: {}", path),
             }
+        }
+        "write" => {
+            let Some(args) = command.strip_prefix("write ") else {
+                crate::println!("usage: write <FILE> <TEXT>");
+                return;
+            };
+            let Some((path, contents)) = args.split_once(' ') else {
+                crate::println!("usage: write <FILE> <TEXT>");
+                return;
+            };
+
+            match crate::fs::vfs::write(path, contents) {
+                Ok(()) => crate::println!("written: {}", path),
+                Err(error) => crate::println!("write failed: {}", error.message()),
+            }
+        }
+        "rm" => {
+            let Some(path) = parts.next() else {
+                crate::println!("usage: rm <FILE>");
+                return;
+            };
+
+            match crate::fs::vfs::remove(path) {
+                Ok(()) => crate::println!("removed: {}", path),
+                Err(error) => crate::println!("remove failed: {}", error.message()),
+            }
+        }
+        "storage" => {
+            let device = crate::drivers::storage::primary_device();
+            crate::println!("storage device = {}", device.name);
+            crate::println!("writable = {}", device.writable);
+            crate::println!("persistent = {}", device.persistent);
+            crate::println!("block size = {}", device.block_size);
         }
         "clear" => {
             crate::drivers::framebuffer::redraw_boot_shell_surface();

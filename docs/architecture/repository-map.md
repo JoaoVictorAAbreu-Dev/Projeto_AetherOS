@@ -16,6 +16,12 @@ This page explains why the repository is organized the way it is, so contributor
 - `tools/`: project-side tooling and automation helpers
 - `user/`: userland-facing space kept available for later milestones without affecting the v1 kernel layout
 
+Within `kernel/`, the VFS now separates:
+
+- read-only boot assets from `initramfs`
+- writable overlay files managed in memory
+- storage-facing expansion points under `drivers/storage`
+
 ## Design Intent
 
 The repository is structured to keep these concerns separate:
